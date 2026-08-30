@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Sticky navbar is ~80px tall, so anchor targets get some breathing room. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-white font-body text-ink antialiased;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading text-navy;
+    line-height: 1.2;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users. */
+  :focus-visible {
+    outline: 3px solid #2aa7e0;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Standard page width + horizontal padding used by every section. */
+  .container-x {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Vertical rhythm for sections. */
+  .section-y {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+}
+
+/* Users who prefer reduced motion get a still, calm site. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
