@@ -44,15 +44,14 @@
 
 /* Users who prefer reduced motion get a still, calm site. */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    /* Covers the testimonial carousel and any other scroll-snap container,
+       not just the document itself. */
+    scroll-behavior: auto !important;
   }
 }

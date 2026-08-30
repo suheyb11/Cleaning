@@ -4,12 +4,14 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-import { hero, site } from "@/data/content";
+import { hero, heroText, site, whatsappLink, whatsappMessages } from "@/data/content";
+import { useLang } from "./LanguageProvider";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Icon from "./ui/Icon";
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
+  const { t } = useLang();
 
   // One shared "fade + slide up" used for each hero element, staggered by index.
   const fadeUp = (delay: number) =>
@@ -24,20 +26,44 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-navy-sky text-white"
+      className="relative overflow-hidden bg-navy text-white"
     >
-      {/* ---------- Floating background bubbles ---------- */}
-      {/* Purely decorative — hidden from screen readers. */}
+      {/* ---------- Gradient mesh ----------
+          Three soft radial pools of colour over flat navy. This reads as a
+          crafted background rather than the stock 135° linear gradient that
+          every template ships with. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: [
+            "radial-gradient(60rem 40rem at 78% 8%, rgba(42,167,224,0.42), transparent 60%)",
+            "radial-gradient(45rem 35rem at 8% 95%, rgba(42,167,224,0.22), transparent 62%)",
+            "radial-gradient(38rem 30rem at 45% 40%, rgba(18,58,99,0.85), transparent 70%)",
+          ].join(", "),
+        }}
+      />
+
+      {/* ---------- Fine grid, for texture ---------- */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+      />
+
+      {/* ---------- Floating accent shapes ---------- */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-sky/25 blur-3xl animate-float" />
+        <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-sky/20 blur-3xl animate-float" />
         <div className="absolute -right-16 top-1/3 h-80 w-80 rounded-full bg-white/10 blur-3xl animate-float-slow" />
-        <div className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-sky/20 blur-3xl animate-float" />
         <div className="absolute right-[12%] top-24 h-16 w-16 rounded-full border border-white/25 animate-float-slow" />
         <div className="absolute left-[8%] bottom-24 h-10 w-10 rounded-full border border-white/20 animate-float" />
       </div>
 
       {/* ---------- Continuously floating accent icons ---------- */}
-      {/* Decorative only — hidden on small screens so they never crowd the text. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 hidden lg:block"
@@ -66,21 +92,21 @@ export default function Hero() {
             className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white/90 backdrop-blur-sm sm:text-sm"
           >
             <Icon name="Sparkles" className="h-4 w-4 text-sky" />
-            {hero.eyebrow}
+            {t(heroText.eyebrow)}
           </motion.p>
 
           <motion.h1
             {...fadeUp(0.15)}
             className="max-w-2xl text-4xl font-semibold !text-white sm:text-5xl lg:text-[3.4rem]"
           >
-            {hero.headline}
+            {t(heroText.headline)}
           </motion.h1>
 
           <motion.p
             {...fadeUp(0.25)}
             className="mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg"
           >
-            {hero.subtext}
+            {t(heroText.subtext)}
           </motion.p>
 
           {/* ---------- Buttons ---------- */}
@@ -92,22 +118,34 @@ export default function Hero() {
               href={hero.primaryCta.href}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-sky px-7 py-3.5 font-heading text-base font-semibold text-white shadow-lift transition-all duration-200 hover:-translate-y-0.5 hover:bg-skyDark"
             >
-              {hero.primaryCta.label}
+              {t(heroText.primaryCta)}
               <Icon name="ArrowRight" className="h-5 w-5" />
             </Link>
 
-            <Link
-              href={hero.secondaryCta.href}
+            {/* TODO: set the real WhatsApp number in data/content.ts (WHATSAPP_NUMBER). */}
+            <a
+              href={whatsappLink(whatsappMessages.hero)}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-white/40 px-7 py-3.5 font-heading text-base font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white hover:bg-white/10"
             >
-              {hero.secondaryCta.label}
-            </Link>
+              <Icon name="MessageCircle" className="h-5 w-5" />
+              {t(heroText.secondaryCta)}
+            </a>
           </motion.div>
+
+          {/* ---------- Trust row ---------- */}
+          <motion.p
+            {...fadeUp(0.45)}
+            className="mt-8 text-sm font-medium text-sky"
+          >
+            {t(heroText.trustRow)}
+          </motion.p>
 
           {/* ---------- Small trust points ---------- */}
           <motion.ul
-            {...fadeUp(0.45)}
-            className="mt-9 flex flex-wrap gap-x-6 gap-y-2.5 text-sm text-white/80"
+            {...fadeUp(0.5)}
+            className="mt-4 flex flex-wrap gap-x-6 gap-y-2.5 text-sm text-white/80"
           >
             {hero.highlights.map((item) => (
               <li key={item} className="flex items-center gap-2">
@@ -131,10 +169,10 @@ export default function Hero() {
               className="object-cover"
             />
 
-            {/* Navy gradient so the caption stays readable over the photo. */}
+            {/* Navy overlay so the caption stays readable over any photo. */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-transparent"
+              className="absolute inset-0 bg-gradient-to-t from-navy via-navy/45 to-navy/10"
             />
 
             <div className="absolute inset-x-0 bottom-0 p-7 text-center">

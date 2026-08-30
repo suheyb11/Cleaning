@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, type FormEvent } from "react";
 
-import { contact, services, site } from "@/data/content";
+import { contact, sectionText, services, site } from "@/data/content";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Icon from "./ui/Icon";
 import Reveal from "./ui/Reveal";
@@ -52,11 +52,7 @@ export default function ContactSection() {
   return (
     <section id="contact" className="section-y bg-offwhite">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="Get in Touch"
-          title="Contact Our Team"
-          subtitle="Tell us about your space and the services you need. We will reply with a clear quotation based on the agreed scope of work."
-        />
+        <SectionHeading text={sectionText.contact} />
 
         <div className="grid gap-8 lg:grid-cols-5">
           {/* ---------------- Contact details ---------------- */}

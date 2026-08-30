@@ -1,50 +1,65 @@
 "use client";
 
-import { useInView, useReducedMotion } from "framer-motion";
+import { animate, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 import { stats } from "@/data/content";
 
 /**
- * A single number that counts up from 0 to `value` the first time it
- * scrolls into view. Users with "reduce motion" see the final number at once.
+ * A single number that counts up to `value` the first time it scrolls into
+ * view, then stays there.
+ *
+ * The count is driven by framer-motion's `animate()` rather than a hand-rolled
+ * requestAnimationFrame loop, because that loop could be cancelled mid-flight
+ * (an effect re-run, a Fast Refresh, a resize) and leave the number frozen on
+ * whatever it had reached — 98 instead of 100. `onComplete` writes the exact
+ * target as the last thing that happens, and `hasRun` makes sure a re-render
+ * can never restart it from zero.
  */
 function Counter({ value, suffix }: { value: number; suffix: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
   const reduceMotion = useReducedMotion();
   const [display, setDisplay] = useState(0);
+  const hasRun = useRef(false);
+  const stop = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
-    if (!inView) return;
+  // Cancel an in-flight count if the component goes away mid-animation.
+  useEffect(() => () => stop.current?.(), []);
+
+  function start() {
+    if (hasRun.current) return;
+    hasRun.current = true;
 
     if (reduceMotion) {
       setDisplay(value);
       return;
     }
 
-    const duration = 1400; // milliseconds
-    const start = performance.now();
-    let frame = 0;
+    const controls = animate(0, value, {
+      duration: 1.4,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (latest) => setDisplay(Math.round(latest)),
+      // The animation is the decoration; this line is the guarantee.
+      onComplete: () => setDisplay(value),
+    });
 
-    const tick = (now: number) => {
-      const progress = Math.min((now - start) / duration, 1);
-      // Ease-out so the number slows down as it approaches the target.
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(value * eased));
-
-      if (progress < 1) frame = requestAnimationFrame(tick);
+    stop.current = () => {
+      controls.stop();
+      setDisplay(value);
     };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [inView, value, reduceMotion]);
+  }
 
   return (
-    <span ref={ref} className="tabular-nums">
+    <motion.span
+      className="inline-block tabular-nums"
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      onViewportEnter={start}
+    >
       {display}
       {suffix}
-    </span>
+    </motion.span>
   );
 }
 

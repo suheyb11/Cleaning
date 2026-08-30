@@ -2,19 +2,20 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-import { contact } from "@/data/content";
+import { whatsappLink, whatsappMessages } from "@/data/content";
 import Icon from "./ui/Icon";
 
 /**
  * Floating WhatsApp button, fixed to the bottom-right corner on every page.
- * TODO: put the real WhatsApp number in data/content.ts (contact.whatsappHref).
+ * Opens the chat with a quote request already typed in.
+ * TODO: put the real WhatsApp number in data/content.ts (WHATSAPP_NUMBER).
  */
 export default function WhatsAppButton() {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.a
-      href={contact.whatsappHref}
+      href={whatsappLink(whatsappMessages.general)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with Bilic Cleaning Company on WhatsApp"

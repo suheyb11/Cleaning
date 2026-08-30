@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { industries } from "@/data/content";
+import { industries, sectionText } from "@/data/content";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Reveal from "./ui/Reveal";
 import SectionHeading from "./ui/SectionHeading";
@@ -13,11 +13,7 @@ export default function Industries() {
   return (
     <section id="industries" className="section-y bg-white">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="Who We Serve"
-          title="Industries We Serve"
-          subtitle="From family homes to hotels, schools and managed properties — we adapt our service to the type of space you run."
-        />
+        <SectionHeading text={sectionText.industries} />
 
         <div className="grid gap-7 md:grid-cols-2">
           {industries.map((industry, index) => (

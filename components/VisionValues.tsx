@@ -1,4 +1,4 @@
-import { coreValues, mission, vision } from "@/data/content";
+import { coreValues, mission, sectionText, vision } from "@/data/content";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Reveal from "./ui/Reveal";
 import SectionHeading from "./ui/SectionHeading";
@@ -7,11 +7,7 @@ export default function VisionValues() {
   return (
     <section id="vision" className="section-y bg-offwhite">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="What Drives Us"
-          title="Vision, Mission & Core Values"
-          subtitle="Clear standards guide every job we take on, large or small."
-        />
+        <SectionHeading text={sectionText.vision} />
 
         {/* ---------- Vision & Mission ---------- */}
         <div className="grid gap-6 lg:grid-cols-2">

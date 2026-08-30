@@ -1,4 +1,4 @@
-import { site, whyChoose } from "@/data/content";
+import { sectionText, whyChoose } from "@/data/content";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Card from "./ui/Card";
 import Reveal from "./ui/Reveal";
@@ -8,11 +8,7 @@ export default function WhyChoose() {
   return (
     <section id="why-us" className="section-y bg-white">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="Why Bilic"
-          title="Why Choose Bilic Cleaning Company"
-          subtitle={site.promise}
-        />
+        <SectionHeading text={sectionText.whyUs} />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {whyChoose.map((item, index) => (

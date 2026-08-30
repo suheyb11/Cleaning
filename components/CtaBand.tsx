@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { contact, ctaBand } from "@/data/content";
+import { ctaBand, whatsappLink, whatsappMessages } from "@/data/content";
 import Button from "./ui/Button";
 import Icon from "./ui/Icon";
 import Reveal from "./ui/Reveal";
@@ -49,9 +49,10 @@ export default function CtaBand() {
                 <Icon name="ArrowRight" className="h-5 w-5" />
               </Button>
 
-              {/* TODO: this opens WhatsApp — set the real number in data/content.ts */}
+              {/* Opens WhatsApp with the booking message pre-filled.
+                  TODO: set the real number in data/content.ts (WHATSAPP_NUMBER). */}
               <a
-                href={contact.whatsappHref}
+                href={whatsappLink(whatsappMessages.booking)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-white/40 px-7 py-3.5 font-heading text-base font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white hover:bg-white/10"

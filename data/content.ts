@@ -25,6 +25,15 @@ function unsplash(id: string, width = 1200) {
   return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=70`;
 }
 
+/**
+ * Same idea for Pexels, whose free library has better photography of African
+ * cleaning staff. `id` is the number in the pexels.com/photo/...-<id>/ URL.
+ * TODO: replace with a real Bilic Cleaning photo.
+ */
+function pexels(id: number, width = 1200) {
+  return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${width}`;
+}
+
 /* --------------------------------------------------------------------------
  * 1. BRAND + CONTACT DETAILS
  * ----------------------------------------------------------------------- */
@@ -45,15 +54,39 @@ export const site = {
   url: "https://bilic-cleaning.example.com",
 };
 
+/* --------------------------------------------------------------------------
+ * WhatsApp — ONE place to change the number.
+ * ----------------------------------------------------------------------- */
+
+/**
+ * TODO: Insert the real WhatsApp number — country code first, digits only,
+ * no "+", spaces or dashes. Example for Somalia: "252612345678".
+ * This single value drives every WhatsApp link on the site.
+ */
+export const WHATSAPP_NUMBER = "000000000000";
+
+/** The pre-filled message used by each WhatsApp entry point. */
+export const whatsappMessages = {
+  general: "Hello Bilic Cleaning, I'd like a quote for a cleaning service.",
+  hero: "Hello Bilic Cleaning, I'd like a free quote for cleaning my ",
+  booking: "Hello Bilic Cleaning, I'd like to book a cleaning service for ",
+  quote:
+    "Hello Bilic Cleaning, I'd like a free quotation. Property type, size and how often: ",
+};
+
+/** Builds a wa.me link that opens the chat with `message` already typed in. */
+export function whatsappLink(message: string = whatsappMessages.general) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 export const contact = {
   // TODO: Insert the real phone number (used for the "tel:" link).
   phone: "[Insert Phone Number]",
   phoneHref: "tel:+000000000000", // TODO: Insert real phone number in international format.
 
-  // TODO: Insert the real WhatsApp number.
+  // TODO: Insert the real WhatsApp number (display text only — links use WHATSAPP_NUMBER above).
   whatsapp: "[Insert WhatsApp Number]",
-  // TODO: Replace the digits below with the real WhatsApp number (country code, no + or spaces).
-  whatsappHref: "https://wa.me/000000000000",
+  whatsappHref: whatsappLink(),
 
   // TODO: Insert the real email address.
   email: "[Insert Email Address]",
@@ -77,12 +110,12 @@ export const contact = {
  * ----------------------------------------------------------------------- */
 
 export const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Why Us", href: "/#why-us" },
-  { label: "Process", href: "/#process" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", labelSo: "Bogga Hore", href: "/" },
+  { label: "About", labelSo: "Nagu Saabsan", href: "/about" },
+  { label: "Services", labelSo: "Adeegyada", href: "/services" },
+  { label: "Why Us", labelSo: "Maxaad Noo Doorataa", href: "/#why-us" },
+  { label: "Process", labelSo: "Habka Shaqada", href: "/#process" },
+  { label: "Contact", labelSo: "Nala Soo Xiriir", href: "/contact" },
 ];
 
 /* --------------------------------------------------------------------------
@@ -97,9 +130,14 @@ export const hero = {
   primaryCta: { label: "Get a Quote", href: "/contact" },
   secondaryCta: { label: "Contact Us", href: "/contact" },
   // TODO: replace with a real Bilic Cleaning photo.
-  image: unsplash("photo-1646980241033-cd7abda2ee88", 1000),
+  // Alternatives if this one doesn't suit — swap the number below:
+  //   6197124  young woman in overalls cleaning a glass window
+  //   6496047  young woman vacuuming a modern living room
+  //   6195121  a full cleaning team in uniform, posed
+  //   6195197  gloved hands wiping down a marble table (no face)
+  image: pexels(6196694, 1000),
   imageAlt:
-    "A professional cleaner carrying cleaning equipment up the stairs of a home",
+    "A cleaner in work overalls vacuuming a bright, modern interior",
   // Small trust points shown under the hero buttons.
   highlights: [
     "Homes & Apartments",
@@ -573,4 +611,272 @@ export const ctaBand = {
   // TODO: replace with a real Bilic Cleaning photo.
   image: unsplash("photo-1497366754035-f200968a6e72", 1600),
   imageAlt: "",
+};
+
+/* --------------------------------------------------------------------------
+ * 13. TRUST BAND — slim row of promises, sits directly under the hero.
+ * ----------------------------------------------------------------------- */
+
+export const trustPoints = [
+  {
+    title: "Vetted & Professional Staff",
+    text: "Trained, punctual and accountable teams.",
+    icon: "BadgeCheck",
+  },
+  {
+    title: "Reliable Scheduling",
+    text: "Times we agree are times we keep.",
+    icon: "CalendarClock",
+  },
+  {
+    title: "Quality-Inspected Work",
+    text: "Every job checked against agreed standards.",
+    icon: "ShieldCheck",
+  },
+  {
+    title: "Free Quotation",
+    text: "Clear pricing before any work begins.",
+    icon: "FileText",
+  },
+];
+
+/* --------------------------------------------------------------------------
+ * 14. TESTIMONIALS
+ * ----------------------------------------------------------------------- */
+
+/**
+ * TODO: replace with real client reviews.
+ * These are realistic placeholders written to match the services Bilic
+ * actually offers — swap the quote, name and role for genuine ones before
+ * going live. Do not publish invented reviews as if they were real.
+ */
+export const testimonials = [
+  {
+    quote:
+      "We moved into a newly finished office and the dust was everywhere. Bilic handled the post-construction clean in a single day and we opened on schedule.",
+    name: "[Insert Client Name]",
+    role: "Office Manager, [Insert Company]",
+    rating: 5,
+  },
+  {
+    quote:
+      "They come every week, always on time, and the building has never looked better. The team is polite and we never have to chase them.",
+    name: "[Insert Client Name]",
+    role: "Property Manager, [Insert Company]",
+    rating: 5,
+  },
+  {
+    quote:
+      "I booked a deep clean before a family event. The kitchen and bathrooms looked brand new and the quotation was exactly what we agreed.",
+    name: "[Insert Client Name]",
+    role: "Homeowner, Mogadishu",
+    rating: 5,
+  },
+];
+
+/* --------------------------------------------------------------------------
+ * 15. BEFORE & AFTER
+ * ----------------------------------------------------------------------- */
+
+export const beforeAfter = {
+  // Heading text lives in `sectionText.beforeAfter` further down, so the
+  // EN / SO toggle reaches it.
+  // TODO: replace with real Bilic before/after photos — ideally the SAME room,
+  // same angle and same lighting, so the slider reads as one honest comparison.
+  before: {
+    image: pexels(6555454, 1400),
+    alt: "A cluttered, untidy living room before cleaning",
+  },
+  after: {
+    image: pexels(7546721, 1400),
+    alt: "A bright, spotless living room after cleaning",
+  },
+};
+
+/* --------------------------------------------------------------------------
+ * 16. FAQ
+ * ----------------------------------------------------------------------- */
+
+export const faqs = [
+  {
+    question: "What areas do you cover?",
+    answer:
+      "We serve Mogadishu and the surrounding areas. If you are just outside the city, contact us anyway — we will tell you honestly whether we can reach you.",
+  },
+  {
+    question: "Do you bring your own equipment and supplies?",
+    answer:
+      "Yes. Our teams arrive with the equipment and cleaning supplies needed for the job. If your site requires specific products, tell us in advance and we will arrange it.",
+  },
+  {
+    question: "Can I book a one-time clean or a recurring contract?",
+    answer:
+      "Both. We handle one-off jobs such as deep cleans, move-in / move-out and post-construction cleaning, as well as recurring daily, weekly or monthly schedules.",
+  },
+  {
+    question: "How do you price a job?",
+    answer:
+      "Pricing is based on the size and condition of the space, how often you need us, and the exact scope of work. We assess first, then give you a clear quotation — the quote is free.",
+  },
+  {
+    question: "Do you offer office and commercial contracts?",
+    answer:
+      "Yes. We work with offices, retail, hotels, restaurants, schools, clinics, NGOs and property managers on both short-term projects and long-term cleaning contracts.",
+  },
+  {
+    question: "How do I get a quote?",
+    answer:
+      "Send us the details through the contact form on this site, or message us on WhatsApp. Tell us the property type, rough size and how often you need cleaning, and we will come back to you.",
+  },
+];
+
+/* --------------------------------------------------------------------------
+ * 17. MAP (Contact page)
+ * ----------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+ * 18. LANGUAGE (English / Somali)
+ * --------------------------------------------------------------------------
+ *  Scope: navbar, hero and every section heading — the parts a Mogadishu
+ *  visitor reads first.
+ *
+ *  TODO: extend translations. Body copy (service descriptions, About
+ *  paragraphs, FAQ answers, form labels, footer) is still English only.
+ *  To extend: give the string a { en, so } shape like the ones below and read
+ *  it through `useLang()` in the component that renders it.
+ * ----------------------------------------------------------------------- */
+
+export type Lang = "en" | "so";
+
+/** A string that exists in both languages. */
+export type Bilingual = { en: string; so: string };
+
+/** Eyebrow + title + subtitle for one section, in both languages. */
+export type SectionText = {
+  eyebrow: Bilingual;
+  title: Bilingual;
+  subtitle?: Bilingual;
+};
+
+export const heroText = {
+  eyebrow: {
+    en: "Professional Cleaning & Facility Services · Mogadishu, Somalia",
+    so: "Adeegyo Nadaafad & Maareyn Xarumeed · Muqdisho, Soomaaliya",
+  },
+  headline: {
+    en: "Professional Cleaning You Can Trust",
+    so: "Nadaafad Xirfadeysan Oo Aad Ku Kalsoonaan Karto",
+  },
+  subtext: {
+    en: "Bilic Cleaning Company delivers reliable, high-quality cleaning and facility services for homes, offices, businesses and institutions across Mogadishu — with trained teams, agreed schedules and a clear quotation before we start.",
+    so: "Bilic Cleaning Company waxay bixisaa adeegyo nadaafad oo tayo sare leh oo lagu kalsoonaan karo — guryaha, xafiisyada, ganacsiyada iyo hay'adaha Muqdisho. Kooxo tababaran, jadwal la isku raacay, iyo qiimo cad oo hore loo sheego.",
+  },
+  primaryCta: { en: "Get a Free Quote", so: "Qiimo Bilaash Ah Codso" },
+  secondaryCta: { en: "Chat on WhatsApp", so: "WhatsApp Nagala Soo Xiriir" },
+  trustRow: {
+    en: "Serving Mogadishu · 10+ services · Free quotes",
+    so: "Muqdisho iyo hareeraheeda · 10+ adeeg · Qiimo bilaash ah",
+  },
+};
+
+export const uiText = {
+  quote: { en: "Get a Quote", so: "Qiimo Codso" },
+  menu: { en: "Menu", so: "Liiska" },
+  language: { en: "Language", so: "Luqadda" },
+};
+
+/**
+ * Heading text for every section, keyed by the section it belongs to.
+ * Pass one of these to <SectionHeading text={...} />.
+ */
+export const sectionText: Record<string, SectionText> = {
+  services: {
+    eyebrow: { en: "What We Do", so: "Waxaan Qabanno" },
+    title: { en: "Our Cleaning Services", so: "Adeegyadeenna Nadaafadda" },
+    subtitle: {
+      en: "Ten professional services covering homes, offices, institutions and construction projects — delivered by a reliable team with attention to detail.",
+      so: "Toban adeeg oo xirfadeysan oo daboolaya guryaha, xafiisyada, hay'adaha iyo mashaariicda dhismaha — koox lagu kalsoonaan karo ayaa fuliya.",
+    },
+  },
+  whyUs: {
+    eyebrow: { en: "Why Bilic", so: "Maxay Bilic" },
+    title: {
+      en: "Why Choose Bilic Cleaning Company",
+      so: "Maxaad U Doorataa Bilic Cleaning Company",
+    },
+    subtitle: {
+      en: "Professional People. Reliable Service. Quality Results.",
+      so: "Dad Xirfad Leh. Adeeg La Isku Halleyn Karo. Natiijo Tayo Leh.",
+    },
+  },
+  process: {
+    eyebrow: { en: "How We Work", so: "Sida Aan U Shaqeyno" },
+    title: { en: "Our Service Process", so: "Habka Adeeggeenna" },
+    subtitle: {
+      en: "Eight clear steps, from your first message to the feedback that helps us improve.",
+      so: "Sideed tallaabo oo cad, laga bilaabo fariintaada koowaad ilaa jawaabcelinta na horumarisa.",
+    },
+  },
+  industries: {
+    eyebrow: { en: "Who We Serve", so: "Cidda Aan U Adeegno" },
+    title: { en: "Industries We Serve", so: "Qaybaha Aan U Adeegno" },
+    subtitle: {
+      en: "From family homes to hotels, schools and managed properties — we adapt our service to the type of space you run.",
+      so: "Laga bilaabo guryaha qoysaska ilaa huteellada, dugsiyada iyo hantida la maamulo — adeegga waxaan u habeynaa nooca goobta aad leedahay.",
+    },
+  },
+  vision: {
+    eyebrow: { en: "What Drives Us", so: "Waxa Na Kaxeeya" },
+    title: {
+      en: "Vision, Mission & Core Values",
+      so: "Aragtida, Himilada & Qiyamka Aasaasiga",
+    },
+    subtitle: {
+      en: "Clear standards guide every job we take on, large or small.",
+      so: "Heerar cad ayaa hagaya shaqo kasta oo aan qabanno, ha weynaato ha yaraatee.",
+    },
+  },
+  testimonials: {
+    eyebrow: { en: "Client Feedback", so: "Jawaabcelinta Macaamiisha" },
+    title: { en: "What Our Clients Say", so: "Waxa Ay Macaamiishu Yiraahdaan" },
+    subtitle: {
+      en: "Homes, offices and managed buildings across Mogadishu that trust us with their space.",
+      so: "Guryo, xafiisyo iyo dhismayaal la maamulo oo Muqdisho ku yaal oo nagu kalsoon.",
+    },
+  },
+  beforeAfter: {
+    eyebrow: { en: "See The Difference", so: "Arag Farqiga" },
+    title: { en: "Before & After", so: "Ka Hor & Ka Dib" },
+    subtitle: {
+      en: "Drag the handle to see what a Bilic clean actually changes.",
+      so: "Jiid calaamadda si aad u aragto waxa nadaafadda Bilic dhab ahaan beddesho.",
+    },
+  },
+  faq: {
+    eyebrow: { en: "Good To Know", so: "Wax Wanaagsan In La Ogaado" },
+    title: { en: "Frequently Asked Questions", so: "Su'aalaha Badanaa La Weydiiyo" },
+    subtitle: {
+      en: "The things clients ask us most before booking. Anything else — just ask.",
+      so: "Waxyaabaha macaamiishu badanaa na weydiiyaan ka hor inta aanay dalban. Wax kale — na weydii.",
+    },
+  },
+  contact: {
+    eyebrow: { en: "Get in Touch", so: "Nala Soo Xiriir" },
+    title: { en: "Contact Our Team", so: "La Xiriir Kooxdeenna" },
+    subtitle: {
+      en: "Tell us about your space and the services you need. We will reply with a clear quotation based on the agreed scope of work.",
+      so: "Noo sheeg goobtaada iyo adeegyada aad u baahan tahay. Waxaan kugu soo celin doonnaa qiimo cad oo ku saleysan shaqada la isku raacay.",
+    },
+  },
+};
+
+export const mapEmbed = {
+  title: "Bilic Cleaning Company service area — Mogadishu, Somalia",
+  /**
+   * TODO: set the exact location / pin.
+   * Open Google Maps → search your address → Share → Embed a map → copy the
+   * `src` from the <iframe> it gives you and paste it here. The URL below is a
+   * general Mogadishu view, not a pinned business location.
+   */
+  src: "https://www.google.com/maps?q=Mogadishu,Somalia&z=12&output=embed",
 };

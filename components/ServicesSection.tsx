@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { services } from "@/data/content";
+import { sectionText, services } from "@/data/content";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Button from "./ui/Button";
 import Icon from "./ui/Icon";
@@ -12,11 +12,7 @@ export default function ServicesSection() {
   return (
     <section id="services" className="section-y bg-offwhite">
       <div className="container-x">
-        <SectionHeading
-          eyebrow="What We Do"
-          title="Our Cleaning Services"
-          subtitle="Ten professional services covering homes, offices, institutions and construction projects — delivered by a reliable team with attention to detail."
-        />
+        <SectionHeading text={sectionText.services} />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (

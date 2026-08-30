@@ -1,53 +1,50 @@
 import Image from "next/image";
 
 import { about, site } from "@/data/content";
-import AnimatedIcon from "./ui/AnimatedIcon";
 import Button from "./ui/Button";
 import Icon from "./ui/Icon";
-import Reveal from "./ui/Reveal";
 
 /**
  * Two-column "image + text" section.
  * The supporting points are a light checklist — deliberately NOT cards, so the
  * page does not become an endless grid of identical boxes.
+ *
+ * This section is intentionally static: no scroll reveal, no icon spring, no
+ * hover zoom. It renders fully on the server and ships no JavaScript.
  */
 export default function AboutSection() {
   return (
     <section id="about" className="section-y bg-white">
       <div className="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         {/* ---------- Image side ---------- */}
-        <Reveal>
-          <div className="group relative">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lift">
-              {/* TODO: replace with a real Bilic Cleaning photo (see data/content.ts). */}
-              <Image
-                src={about.image}
-                alt={about.imageAlt}
-                fill
-                sizes="(max-width: 1024px) 100vw, 550px"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-
-            {/* Small floating badge overlapping the photo */}
-            <div className="absolute -bottom-6 -right-2 flex items-center gap-3 rounded-2xl bg-navy px-5 py-4 shadow-lift sm:right-6">
-              <AnimatedIcon
-                name="Sparkles"
-                wrapperClassName="flex h-11 w-11 items-center justify-center rounded-xl bg-sky text-white"
-                className="h-5 w-5"
-              />
-              <span className="font-heading text-sm font-semibold leading-tight text-white">
-                Professional People
-                <span className="block text-xs font-normal text-white/70">
-                  Reliable service, quality results
-                </span>
-              </span>
-            </div>
+        <div className="relative">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lift">
+            {/* TODO: replace with a real Bilic Cleaning photo (see data/content.ts). */}
+            <Image
+              src={about.image}
+              alt={about.imageAlt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 550px"
+              className="object-cover"
+            />
           </div>
-        </Reveal>
+
+          {/* Small badge overlapping the photo */}
+          <div className="absolute -bottom-6 -right-2 flex items-center gap-3 rounded-2xl bg-navy px-5 py-4 shadow-lift sm:right-6">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky text-white">
+              <Icon name="Sparkles" className="h-5 w-5" />
+            </span>
+            <span className="font-heading text-sm font-semibold leading-tight text-white">
+              Professional People
+              <span className="block text-xs font-normal text-white/70">
+                Reliable service, quality results
+              </span>
+            </span>
+          </div>
+        </div>
 
         {/* ---------- Text side ---------- */}
-        <Reveal delay={0.12}>
+        <div>
           <p className="mb-3 font-heading text-sm font-semibold uppercase tracking-[0.18em] text-sky">
             About Us
           </p>
@@ -85,7 +82,7 @@ export default function AboutSection() {
           </div>
 
           <p className="mt-6 text-sm italic text-muted">{site.nameMeaning}</p>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

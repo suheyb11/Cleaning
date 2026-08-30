@@ -64,6 +64,10 @@ export default function ServicesPage() {
                     src={service.image}
                     alt={service.imageAlt}
                     fill
+                    // The first row is above the fold and is this page's LCP.
+                    // The rest stay lazy so they cost nothing until scrolled to.
+                    priority={index === 0}
+                    loading={index === 0 ? undefined : "lazy"}
                     sizes="(max-width: 1024px) 100vw, 560px"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />

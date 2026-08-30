@@ -53,6 +53,8 @@ export default function AboutPage() {
                 src={about.secondaryImage}
                 alt={about.secondaryImageAlt}
                 fill
+                // Above the fold on this page — it is the LCP element.
+                priority
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
