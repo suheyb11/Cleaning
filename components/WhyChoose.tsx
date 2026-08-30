@@ -18,7 +18,7 @@ export default function WhyChoose() {
                   <AnimatedIcon
                     name={item.icon}
                     delay={index * 0.06}
-                    wrapperClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-navy shadow-soft transition-colors duration-300 group-hover:bg-sky group-hover:text-white"
+                    wrapperClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky/10 text-navy transition-colors duration-300 group-hover:bg-sky group-hover:text-white"
                     className="h-6 w-6"
                   />
                   <div>

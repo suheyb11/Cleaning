@@ -5,13 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { hero, heroText, site, whatsappLink, whatsappMessages } from "@/data/content";
-import { useLang } from "./LanguageProvider";
 import AnimatedIcon from "./ui/AnimatedIcon";
 import Icon from "./ui/Icon";
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
-  const { t } = useLang();
 
   // One shared "fade + slide up" used for each hero element, staggered by index.
   const fadeUp = (delay: number) =>
@@ -92,21 +90,21 @@ export default function Hero() {
             className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white/90 backdrop-blur-sm sm:text-sm"
           >
             <Icon name="Sparkles" className="h-4 w-4 text-sky" />
-            {t(heroText.eyebrow)}
+            {heroText.eyebrow}
           </motion.p>
 
           <motion.h1
             {...fadeUp(0.15)}
             className="max-w-2xl text-4xl font-semibold !text-white sm:text-5xl lg:text-[3.4rem]"
           >
-            {t(heroText.headline)}
+            {heroText.headline}
           </motion.h1>
 
           <motion.p
             {...fadeUp(0.25)}
             className="mt-6 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg"
           >
-            {t(heroText.subtext)}
+            {heroText.subtext}
           </motion.p>
 
           {/* ---------- Buttons ---------- */}
@@ -118,7 +116,7 @@ export default function Hero() {
               href={hero.primaryCta.href}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-sky px-7 py-3.5 font-heading text-base font-semibold text-white shadow-lift transition-all duration-200 hover:-translate-y-0.5 hover:bg-skyDark"
             >
-              {t(heroText.primaryCta)}
+              {heroText.primaryCta}
               <Icon name="ArrowRight" className="h-5 w-5" />
             </Link>
 
@@ -130,7 +128,7 @@ export default function Hero() {
               className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-white/40 px-7 py-3.5 font-heading text-base font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white hover:bg-white/10"
             >
               <Icon name="MessageCircle" className="h-5 w-5" />
-              {t(heroText.secondaryCta)}
+              {heroText.secondaryCta}
             </a>
           </motion.div>
 
@@ -139,7 +137,7 @@ export default function Hero() {
             {...fadeUp(0.45)}
             className="mt-8 text-sm font-medium text-sky"
           >
-            {t(heroText.trustRow)}
+            {heroText.trustRow}
           </motion.p>
 
           {/* ---------- Small trust points ---------- */}

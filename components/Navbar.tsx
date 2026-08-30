@@ -6,14 +6,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { navLinks, site, uiText } from "@/data/content";
-import { LanguageToggle, useLang } from "./LanguageProvider";
 import Icon from "./ui/Icon";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { lang, t } = useLang();
 
   // Add a shadow + blur to the navbar once the user scrolls away from the top.
   useEffect(() => {
@@ -35,9 +33,6 @@ export default function Navbar() {
    */
   const isActive = (href: string) =>
     href.includes("#") ? false : href === "/" ? pathname === "/" : pathname.startsWith(href);
-
-  const label = (link: (typeof navLinks)[number]) =>
-    lang === "so" ? link.labelSo : link.label;
 
   return (
     <header
@@ -89,7 +84,7 @@ export default function Navbar() {
                       : "text-white/80 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  {label(link)}
+                  {link.label}
                   {active && (
                     <span
                       aria-hidden="true"
@@ -104,13 +99,11 @@ export default function Navbar() {
 
         {/* ---------- Right-hand controls ---------- */}
         <div className="flex items-center gap-2.5">
-          <LanguageToggle className="hidden sm:inline-flex" />
-
           <Link
             href="/contact"
             className="hidden items-center gap-2 rounded-2xl bg-sky px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-skyDark hover:shadow-lift lg:inline-flex"
           >
-            {t(uiText.quote)}
+            {uiText.quote}
             <Icon name="ArrowRight" className="h-4 w-4" />
           </Link>
 
@@ -155,15 +148,11 @@ export default function Navbar() {
                           : "text-white/90 hover:bg-white/10 hover:text-white"
                       }`}
                     >
-                      {label(link)}
+                      {link.label}
                     </Link>
                   </li>
                 );
               })}
-
-              <li className="flex justify-center pt-3 sm:hidden">
-                <LanguageToggle />
-              </li>
 
               <li className="pt-2">
                 <Link
@@ -171,7 +160,7 @@ export default function Navbar() {
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-2xl bg-sky px-5 py-3.5 font-heading font-semibold text-white shadow-soft transition-colors hover:bg-skyDark"
                 >
-                  {t(uiText.quote)}
+                  {uiText.quote}
                   <Icon name="ArrowRight" className="h-4 w-4" />
                 </Link>
               </li>

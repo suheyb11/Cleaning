@@ -29,7 +29,6 @@ marked with a `// TODO:` or `[Insert ...]` in the code. Work top to bottom.
 | 11 | **Testimonials** | `data/content.ts` → `testimonials` | Three realistic placeholders with `[Insert Client Name]`. **Do not publish invented reviews as real** — get permission and use real quotes. |
 | 12 | **Map pin** | `data/content.ts` → `mapEmbed.src` | Currently a general Mogadishu view. Google Maps → search your address → Share → **Embed a map** → copy the `src`. |
 | 13 | **Contact form delivery** | `components/ContactSection.tsx` | Front-end only — submitting sends nothing anywhere. See §4. |
-| 14 | **Somali translations** | `data/content.ts` → `sectionText`, `heroText` | Navbar, hero and section headings are translated. Body copy is not. See §9. |
 
 ---
 
@@ -80,7 +79,9 @@ That file holds, clearly labelled and in order:
 15. Before & after photos
 16. FAQ (6 questions and answers)
 17. Map embed for the contact page
-18. Language strings — `heroText`, `uiText`, `sectionText` (English + Somali)
+18. Section headings — `heroText`, `uiText`, `sectionText`
+
+The site is **English only**. There is no language switcher and no translation layer.
 
 Change the text there and it updates everywhere on the site — home page, inner pages and footer.
 
@@ -235,7 +236,7 @@ app/
   globals.css       Tailwind + base styles + reduced-motion rules
 
 components/
-  Navbar.tsx          Sticky nav, blur-on-scroll, active-link underline, EN/SO toggle
+  Navbar.tsx          Sticky nav, blur-on-scroll, active-link underline
   Footer.tsx          Navy footer with links + contact details
   Hero.tsx            Gradient-mesh hero, floating shapes, trust row, wave divider
   TrustBand.tsx       Slim 4-promise band under the hero
@@ -254,7 +255,6 @@ components/
   ContactSection.tsx  Contact details + quote form
   WhatsAppButton.tsx  Floating WhatsApp button (pre-filled message)
   ScrollProgress.tsx  Thin accent bar showing scroll position
-  LanguageProvider.tsx EN/SO context + the toggle button
   ui/
     AnimatedIcon.tsx   All icon motion (entrance spring, hover, float)
     Button.tsx         Shared button (4 variants)
@@ -296,48 +296,34 @@ Fonts are loaded with `next/font` in `app/layout.tsx`: **Poppins** for headings,
 
 ---
 
-## 8. Language toggle (EN / SO)
+## 8. Section headings & the stats band
 
-There is a small **EN / SO** switch in the navbar. No i18n library — just a React
-context in `components/LanguageProvider.tsx` and `{ en, so }` string pairs in
-`data/content.ts`. The choice is remembered in `localStorage` and `<html lang>`
-is updated to match.
+**Headings.** Every section's eyebrow / title / intro lives in `sectionText` in
+`data/content.ts`, so the wording is changed in one place:
 
-**What is translated today:** the navbar links and CTA, the whole hero, and every
-section heading (eyebrow + title + subtitle).
+```tsx
+<SectionHeading text={sectionText.services} />
+```
 
-**What is not:** body copy — service descriptions, About paragraphs, FAQ answers,
-form labels, the footer, testimonials. These are English only and marked with
-`// TODO: extend translations`.
+`SectionHeading` also still accepts plain `eyebrow` / `title` / `subtitle`
+strings for one-off headings (the inner page headers use this).
 
-To translate one more string:
+**Stats.** A stat is either a number that counts up or a fixed phrase that must
+not be counted:
 
 ```ts
-// 1. give it both languages in data/content.ts
-export const sectionText = {
-  myNewSection: {
-    eyebrow: { en: "…", so: "…" },
-    title:   { en: "…", so: "…" },
-    subtitle:{ en: "…", so: "…" },
-  },
-};
+{ value: 10, suffix: "+", label: "Cleaning Services" }   // counts 0 → 10, renders "10+"
+{ value: 4,               label: "Sectors Served"    }   // counts 0 → 4
+{ display: "24/7",        label: "Support & Scheduling" } // rendered as-is, no count
+{ value: 100, suffix: "%", label: "Satisfaction Focus" } // counts 0 → 100, renders "100%"
 ```
 
-```tsx
-// 2. pass it to SectionHeading instead of the plain props
-<SectionHeading text={sectionText.myNewSection} />
-```
+Use `display` for anything that is not a quantity. `"24/7"` is a phrase — counting
+to 24 and gluing `/7` on the end animates a number that means nothing.
 
-For anything that is not a heading, read it through the hook — the component
-must be a client component (`"use client"`):
-
-```tsx
-const { t } = useLang();
-<p>{t(someBilingualString)}</p>
-```
-
-`SectionHeading` still accepts plain `eyebrow` / `title` / `subtitle` strings, so
-untranslated headings keep working unchanged.
+The count runs once on `whileInView` with `viewport={{ once: true }}` over 1.5s,
+and `onComplete` writes the exact target value, so an interrupted animation can
+never leave the number stranded part-way.
 
 ---
 

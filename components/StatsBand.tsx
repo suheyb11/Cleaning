@@ -5,6 +5,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { stats } from "@/data/content";
 
+/** Shared entrance for both counted and static stats. */
+const enter = {
+  initial: { opacity: 0, y: 10 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.4 } as const,
+  transition: { duration: 0.4, ease: "easeOut" as const },
+};
+
 /**
  * A single number that counts up to `value` the first time it scrolls into
  * view, then stays there.
@@ -16,13 +24,14 @@ import { stats } from "@/data/content";
  * target as the last thing that happens, and `hasRun` makes sure a re-render
  * can never restart it from zero.
  */
-function Counter({ value, suffix }: { value: number; suffix: string }) {
+function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const reduceMotion = useReducedMotion();
   const [display, setDisplay] = useState(0);
   const hasRun = useRef(false);
   const stop = useRef<(() => void) | null>(null);
 
-  // Cancel an in-flight count if the component goes away mid-animation.
+  // If the component goes away mid-count, stop the animation but leave the
+  // final value behind rather than whatever frame it happened to be on.
   useEffect(() => () => stop.current?.(), []);
 
   function start() {
@@ -35,7 +44,7 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
     }
 
     const controls = animate(0, value, {
-      duration: 1.4,
+      duration: 1.5,
       ease: [0.22, 1, 0.36, 1],
       onUpdate: (latest) => setDisplay(Math.round(latest)),
       // The animation is the decoration; this line is the guarantee.
@@ -51,10 +60,7 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
   return (
     <motion.span
       className="inline-block tabular-nums"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      {...enter}
       onViewportEnter={start}
     >
       {display}
@@ -76,7 +82,13 @@ export default function StatsBand() {
         {stats.map((stat) => (
           <div key={stat.label}>
             <p className="font-heading text-4xl font-semibold !text-white sm:text-5xl">
-              <Counter value={stat.value} suffix={stat.suffix} />
+              {stat.display !== undefined ? (
+                <motion.span className="inline-block" {...enter}>
+                  {stat.display}
+                </motion.span>
+              ) : (
+                <Counter value={stat.value ?? 0} suffix={stat.suffix} />
+              )}
             </p>
             <p className="mt-2 text-sm font-medium uppercase tracking-[0.14em] text-sky">
               {stat.label}

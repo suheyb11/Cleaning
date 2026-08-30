@@ -1,20 +1,10 @@
-"use client";
-
 import type { SectionText } from "@/data/content";
-import { useLang } from "../LanguageProvider";
 import Reveal from "./Reveal";
 
 type SectionHeadingProps = {
-  /**
-   * Bilingual heading text from data/content.ts (`sectionText.*`).
-   * Preferred — it makes the section respond to the EN / SO toggle.
-   */
+  /** Heading text from data/content.ts (`sectionText.*`) — preferred. */
   text?: SectionText;
-  /**
-   * Plain English strings, for headings that are not translated yet.
-   * TODO: extend translations — move these into `sectionText` in
-   * data/content.ts as the Somali copy is written.
-   */
+  /** Or pass the strings directly, for one-off headings. */
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -31,12 +21,9 @@ export default function SectionHeading({
   align = "center",
   light = false,
 }: SectionHeadingProps) {
-  const { t } = useLang();
-
-  const resolvedEyebrow = text ? t(text.eyebrow) : eyebrow;
-  const resolvedTitle = text ? t(text.title) : (title ?? "");
-  const resolvedSubtitle =
-    text && text.subtitle ? t(text.subtitle) : subtitle;
+  const resolvedEyebrow = text?.eyebrow ?? eyebrow;
+  const resolvedTitle = text?.title ?? title ?? "";
+  const resolvedSubtitle = text?.subtitle ?? subtitle;
 
   const alignment =
     align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl text-left";

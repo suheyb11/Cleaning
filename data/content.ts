@@ -110,12 +110,12 @@ export const contact = {
  * ----------------------------------------------------------------------- */
 
 export const navLinks = [
-  { label: "Home", labelSo: "Bogga Hore", href: "/" },
-  { label: "About", labelSo: "Nagu Saabsan", href: "/about" },
-  { label: "Services", labelSo: "Adeegyada", href: "/services" },
-  { label: "Why Us", labelSo: "Maxaad Noo Doorataa", href: "/#why-us" },
-  { label: "Process", labelSo: "Habka Shaqada", href: "/#process" },
-  { label: "Contact", labelSo: "Nala Soo Xiriir", href: "/contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Services", href: "/services" },
+  { label: "Why Us", href: "/#why-us" },
+  { label: "Process", href: "/#process" },
+  { label: "Contact", href: "/contact" },
 ];
 
 /* --------------------------------------------------------------------------
@@ -556,13 +556,13 @@ export const mission = {
 };
 
 export const coreValues = [
-  { title: "Professionalism", icon: "Briefcase" },
-  { title: "Quality", icon: "Award" },
+  { title: "Professionalism", icon: "BadgeCheck" },
+  { title: "Quality", icon: "Sparkles" },
   { title: "Reliability", icon: "Clock" },
-  { title: "Integrity", icon: "Scale" },
+  { title: "Integrity", icon: "ShieldCheck" },
   { title: "Customer Satisfaction", icon: "Smile" },
-  { title: "Safety", icon: "ShieldCheck" },
-  { title: "Respect", icon: "Handshake" },
+  { title: "Safety", icon: "HardHat" },
+  { title: "Respect", icon: "HeartHandshake" },
 ];
 
 /* --------------------------------------------------------------------------
@@ -570,10 +570,26 @@ export const coreValues = [
  *     Keep these honest — they describe the offering, not invented numbers.
  * ----------------------------------------------------------------------- */
 
-export const stats = [
+/**
+ * A stat is either a number that counts up (`value`, with an optional
+ * `suffix` glued on the end) or a fixed phrase that must not be counted
+ * (`display`). "24/7" is a phrase, not a quantity — counting to 24 and
+ * sticking "/7" on the end would animate a number that means nothing.
+ */
+export type Stat = {
+  label: string;
+  /** Counts up from 0 to this number. */
+  value?: number;
+  /** Appended after the counted number, e.g. "+" or "%". */
+  suffix?: string;
+  /** Rendered as-is, with no count-up. Wins over `value` if both are set. */
+  display?: string;
+};
+
+export const stats: Stat[] = [
   { value: 10, suffix: "+", label: "Cleaning Services" },
-  { value: 4, suffix: "", label: "Sectors Served" },
-  { value: 24, suffix: "/7", label: "Support & Scheduling" },
+  { value: 4, label: "Sectors Served" },
+  { display: "24/7", label: "Support & Scheduling" },
   { value: 100, suffix: "%", label: "Satisfaction Focus" },
 ];
 
@@ -735,54 +751,33 @@ export const faqs = [
  * ----------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
- * 18. LANGUAGE (English / Somali)
+ * 18. SECTION HEADINGS
  * --------------------------------------------------------------------------
- *  Scope: navbar, hero and every section heading — the parts a Mogadishu
- *  visitor reads first.
- *
- *  TODO: extend translations. Body copy (service descriptions, About
- *  paragraphs, FAQ answers, form labels, footer) is still English only.
- *  To extend: give the string a { en, so } shape like the ones below and read
- *  it through `useLang()` in the component that renders it.
+ *  The site is English only. Every section's eyebrow / title / intro lives
+ *  here so the wording can be changed in one place rather than hunted for
+ *  across a dozen components.
  * ----------------------------------------------------------------------- */
 
-export type Lang = "en" | "so";
-
-/** A string that exists in both languages. */
-export type Bilingual = { en: string; so: string };
-
-/** Eyebrow + title + subtitle for one section, in both languages. */
+/** Eyebrow + title + one-line intro for a section. */
 export type SectionText = {
-  eyebrow: Bilingual;
-  title: Bilingual;
-  subtitle?: Bilingual;
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
 };
 
 export const heroText = {
-  eyebrow: {
-    en: "Professional Cleaning & Facility Services · Mogadishu, Somalia",
-    so: "Adeegyo Nadaafad & Maareyn Xarumeed · Muqdisho, Soomaaliya",
-  },
-  headline: {
-    en: "Professional Cleaning You Can Trust",
-    so: "Nadaafad Xirfadeysan Oo Aad Ku Kalsoonaan Karto",
-  },
-  subtext: {
-    en: "Bilic Cleaning Company delivers reliable, high-quality cleaning and facility services for homes, offices, businesses and institutions across Mogadishu — with trained teams, agreed schedules and a clear quotation before we start.",
-    so: "Bilic Cleaning Company waxay bixisaa adeegyo nadaafad oo tayo sare leh oo lagu kalsoonaan karo — guryaha, xafiisyada, ganacsiyada iyo hay'adaha Muqdisho. Kooxo tababaran, jadwal la isku raacay, iyo qiimo cad oo hore loo sheego.",
-  },
-  primaryCta: { en: "Get a Free Quote", so: "Qiimo Bilaash Ah Codso" },
-  secondaryCta: { en: "Chat on WhatsApp", so: "WhatsApp Nagala Soo Xiriir" },
-  trustRow: {
-    en: "Serving Mogadishu · 10+ services · Free quotes",
-    so: "Muqdisho iyo hareeraheeda · 10+ adeeg · Qiimo bilaash ah",
-  },
+  eyebrow: "Professional Cleaning & Facility Services · Mogadishu, Somalia",
+  headline: "Professional Cleaning You Can Trust",
+  subtext:
+    "Bilic Cleaning Company delivers reliable, high-quality cleaning and facility services for homes, offices, businesses and institutions across Mogadishu — with trained teams, agreed schedules and a clear quotation before we start.",
+  primaryCta: "Get a Free Quote",
+  secondaryCta: "Chat on WhatsApp",
+  trustRow: "Serving Mogadishu · 10+ services · Free quotes",
 };
 
 export const uiText = {
-  quote: { en: "Get a Quote", so: "Qiimo Codso" },
-  menu: { en: "Menu", so: "Liiska" },
-  language: { en: "Language", so: "Luqadda" },
+  quote: "Get a Quote",
+  menu: "Menu",
 };
 
 /**
@@ -791,82 +786,55 @@ export const uiText = {
  */
 export const sectionText: Record<string, SectionText> = {
   services: {
-    eyebrow: { en: "What We Do", so: "Waxaan Qabanno" },
-    title: { en: "Our Cleaning Services", so: "Adeegyadeenna Nadaafadda" },
-    subtitle: {
-      en: "Ten professional services covering homes, offices, institutions and construction projects — delivered by a reliable team with attention to detail.",
-      so: "Toban adeeg oo xirfadeysan oo daboolaya guryaha, xafiisyada, hay'adaha iyo mashaariicda dhismaha — koox lagu kalsoonaan karo ayaa fuliya.",
-    },
+    eyebrow: "What We Do",
+    title: "Our Cleaning Services",
+    subtitle:
+      "Ten professional services covering homes, offices, institutions and construction projects — delivered by a reliable team with attention to detail.",
   },
   whyUs: {
-    eyebrow: { en: "Why Bilic", so: "Maxay Bilic" },
-    title: {
-      en: "Why Choose Bilic Cleaning Company",
-      so: "Maxaad U Doorataa Bilic Cleaning Company",
-    },
-    subtitle: {
-      en: "Professional People. Reliable Service. Quality Results.",
-      so: "Dad Xirfad Leh. Adeeg La Isku Halleyn Karo. Natiijo Tayo Leh.",
-    },
+    eyebrow: "Why Bilic",
+    title: "Why Choose Bilic Cleaning Company",
+    subtitle: "Professional People. Reliable Service. Quality Results.",
   },
   process: {
-    eyebrow: { en: "How We Work", so: "Sida Aan U Shaqeyno" },
-    title: { en: "Our Service Process", so: "Habka Adeeggeenna" },
-    subtitle: {
-      en: "Eight clear steps, from your first message to the feedback that helps us improve.",
-      so: "Sideed tallaabo oo cad, laga bilaabo fariintaada koowaad ilaa jawaabcelinta na horumarisa.",
-    },
+    eyebrow: "How We Work",
+    title: "Our Service Process",
+    subtitle:
+      "Eight clear steps, from your first message to the feedback that helps us improve.",
   },
   industries: {
-    eyebrow: { en: "Who We Serve", so: "Cidda Aan U Adeegno" },
-    title: { en: "Industries We Serve", so: "Qaybaha Aan U Adeegno" },
-    subtitle: {
-      en: "From family homes to hotels, schools and managed properties — we adapt our service to the type of space you run.",
-      so: "Laga bilaabo guryaha qoysaska ilaa huteellada, dugsiyada iyo hantida la maamulo — adeegga waxaan u habeynaa nooca goobta aad leedahay.",
-    },
+    eyebrow: "Who We Serve",
+    title: "Industries We Serve",
+    subtitle:
+      "From family homes to hotels, schools and managed properties — we adapt our service to the type of space you run.",
   },
   vision: {
-    eyebrow: { en: "What Drives Us", so: "Waxa Na Kaxeeya" },
-    title: {
-      en: "Vision, Mission & Core Values",
-      so: "Aragtida, Himilada & Qiyamka Aasaasiga",
-    },
-    subtitle: {
-      en: "Clear standards guide every job we take on, large or small.",
-      so: "Heerar cad ayaa hagaya shaqo kasta oo aan qabanno, ha weynaato ha yaraatee.",
-    },
+    eyebrow: "What Drives Us",
+    title: "Vision, Mission & Core Values",
+    subtitle: "Clear standards guide every job we take on, large or small.",
   },
   testimonials: {
-    eyebrow: { en: "Client Feedback", so: "Jawaabcelinta Macaamiisha" },
-    title: { en: "What Our Clients Say", so: "Waxa Ay Macaamiishu Yiraahdaan" },
-    subtitle: {
-      en: "Homes, offices and managed buildings across Mogadishu that trust us with their space.",
-      so: "Guryo, xafiisyo iyo dhismayaal la maamulo oo Muqdisho ku yaal oo nagu kalsoon.",
-    },
+    eyebrow: "Client Feedback",
+    title: "What Our Clients Say",
+    subtitle:
+      "Homes, offices and managed buildings across Mogadishu that trust us with their space.",
   },
   beforeAfter: {
-    eyebrow: { en: "See The Difference", so: "Arag Farqiga" },
-    title: { en: "Before & After", so: "Ka Hor & Ka Dib" },
-    subtitle: {
-      en: "Drag the handle to see what a Bilic clean actually changes.",
-      so: "Jiid calaamadda si aad u aragto waxa nadaafadda Bilic dhab ahaan beddesho.",
-    },
+    eyebrow: "See The Difference",
+    title: "Before & After",
+    subtitle: "Drag the handle to see what a Bilic clean actually changes.",
   },
   faq: {
-    eyebrow: { en: "Good To Know", so: "Wax Wanaagsan In La Ogaado" },
-    title: { en: "Frequently Asked Questions", so: "Su'aalaha Badanaa La Weydiiyo" },
-    subtitle: {
-      en: "The things clients ask us most before booking. Anything else — just ask.",
-      so: "Waxyaabaha macaamiishu badanaa na weydiiyaan ka hor inta aanay dalban. Wax kale — na weydii.",
-    },
+    eyebrow: "Good To Know",
+    title: "Frequently Asked Questions",
+    subtitle:
+      "The things clients ask us most before booking. Anything else — just ask.",
   },
   contact: {
-    eyebrow: { en: "Get in Touch", so: "Nala Soo Xiriir" },
-    title: { en: "Contact Our Team", so: "La Xiriir Kooxdeenna" },
-    subtitle: {
-      en: "Tell us about your space and the services you need. We will reply with a clear quotation based on the agreed scope of work.",
-      so: "Noo sheeg goobtaada iyo adeegyada aad u baahan tahay. Waxaan kugu soo celin doonnaa qiimo cad oo ku saleysan shaqada la isku raacay.",
-    },
+    eyebrow: "Get in Touch",
+    title: "Contact Our Team",
+    subtitle:
+      "Tell us about your space and the services you need. We will reply with a clear quotation based on the agreed scope of work.",
   },
 };
 

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 
 import Footer from "@/components/Footer";
-import LanguageProvider from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -72,15 +71,13 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <LanguageProvider>
-          <ScrollProgress />
-          <Navbar />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-          <WhatsAppButton />
-        </LanguageProvider>
+        <ScrollProgress />
+        <Navbar />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   );
