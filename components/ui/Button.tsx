@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-type Variant = "primary" | "outline" | "white" | "navy";
+import Icon from "./Icon";
+
+type Variant = "primary" | "outline" | "white" | "navy" | "danger";
 type Size = "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-2xl font-heading font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0";
+  "inline-flex items-center justify-center gap-2 rounded-2xl font-heading font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60 disabled:hover:translate-y-0";
 
 const variants: Record<Variant, string> = {
   // Light-blue accent button — the main call to action.
@@ -16,6 +18,8 @@ const variants: Record<Variant, string> = {
   // For use on dark navy backgrounds.
   white: "bg-white text-navy shadow-soft hover:bg-offwhite hover:shadow-lift",
   navy: "bg-navy text-white shadow-soft hover:bg-[#123A63] hover:shadow-lift",
+  // Destructive actions — delete, remove.
+  danger: "bg-red-600 text-white shadow-soft hover:bg-red-700 hover:shadow-lift",
 };
 
 const sizes: Record<Size, string> = {
@@ -32,6 +36,9 @@ type ButtonProps = {
   className?: string;
   type?: "button" | "submit";
   onClick?: () => void;
+  disabled?: boolean;
+  /** Disables the button and swaps in a spinner ahead of `children`. */
+  loading?: boolean;
 };
 
 export default function Button({
@@ -42,20 +49,33 @@ export default function Button({
   className = "",
   type = "button",
   onClick,
+  disabled = false,
+  loading = false,
 }: ButtonProps) {
   const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+  const content = (
+    <>
+      {loading && <Icon name="Loader2" className="h-4 w-4 animate-spin" />}
+      {children}
+    </>
+  );
 
   if (href) {
     return (
       <Link href={href} className={classes}>
-        {children}
+        {content}
       </Link>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
-      {children}
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={classes}
+    >
+      {content}
     </button>
   );
 }

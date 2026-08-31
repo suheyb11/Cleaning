@@ -9,18 +9,25 @@ import Icon from "./ui/Icon";
 import Reveal from "./ui/Reveal";
 import SectionHeading from "./ui/SectionHeading";
 
-/** The empty state of the form — also used to reset it after a send. */
+/** The empty state of the form — also used to reset it after a send.
+ *  `company` is a honeypot: it's never shown to real visitors, so any
+ *  submission that arrives with it filled in is almost certainly a bot. */
 const emptyForm = {
   name: "",
   phone: "",
   email: "",
   service: "",
   message: "",
+  company: "",
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ContactSection() {
   const [form, setForm] = useState(emptyForm);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function handleChange(
     event: React.ChangeEvent<
@@ -31,16 +38,51 @@ export default function ContactSection() {
     setForm((previous) => ({ ...previous, [name]: value }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    // TODO: connect form to email/WhatsApp.
-    // Options: a Next.js route handler that sends an email (Resend / Nodemailer),
-    // a form service such as Formspree, or simply build a WhatsApp message and
-    // open `${contact.whatsappHref}?text=...`.
-    // For now the form is front-end only and just shows a success message.
-    setSubmitted(true);
-    setForm(emptyForm);
+    if (
+      !form.name.trim() ||
+      !form.phone.trim() ||
+      !form.service.trim() ||
+      !form.message.trim()
+    ) {
+      setError("Please fill in your name, phone, service and message.");
+      return;
+    }
+    if (form.email && !EMAIL_RE.test(form.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const response = await fetch("/api/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data: { ok: boolean; error?: string } = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Could not send your request.");
+      }
+
+      // Success — reset the form, but a real error keeps whatever the
+      // visitor typed so they don't have to redo it.
+      setSubmitted(true);
+      setForm(emptyForm);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not send your request. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   /** Shared styling for all form inputs. */
@@ -226,8 +268,36 @@ export default function ContactSection() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="space-y-5"
+                    className="relative space-y-5"
                   >
+                    {/* Honeypot — invisible to real visitors, so a filled-in
+                        value almost certainly means a bot filled every field. */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
+                    >
+                      <label htmlFor="company">Company</label>
+                      <input
+                        id="company"
+                        name="company"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={form.company}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    {error && (
+                      <div className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        <Icon
+                          name="AlertCircle"
+                          className="mt-0.5 h-4 w-4 shrink-0"
+                        />
+                        <p>{error}</p>
+                      </div>
+                    )}
+
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
                         <label htmlFor="name" className={labelClasses}>
@@ -318,10 +388,14 @@ export default function ContactSection() {
 
                     <button
                       type="submit"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky px-7 py-3.5 font-heading text-base font-semibold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-skyDark hover:shadow-lift sm:w-auto"
+                      disabled={submitting}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sky px-7 py-3.5 font-heading text-base font-semibold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-skyDark hover:shadow-lift disabled:pointer-events-none disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-soft sm:w-auto"
                     >
-                      <Icon name="Send" className="h-5 w-5" />
-                      Request a Free Quote
+                      <Icon
+                        name={submitting ? "Loader2" : "Send"}
+                        className={`h-5 w-5 ${submitting ? "animate-spin" : ""}`}
+                      />
+                      {submitting ? "Sending…" : "Request a Free Quote"}
                     </button>
 
                     <p className="text-xs text-muted">

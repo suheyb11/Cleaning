@@ -55,7 +55,7 @@ export default function ServicesSection() {
                     // siblings. Without its own stacking context the badge
                     // sits in front only while framer's entrance transform is
                     // still applied, then drops behind the photo.
-                    wrapperClassName="relative z-10 -mt-7 mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-navy text-white shadow-soft ring-4 ring-white transition-colors duration-300 group-hover:bg-sky"
+                    wrapperClassName="relative z-10 -mt-7 mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-navy to-sky text-white shadow-soft ring-4 ring-white transition-all duration-300 group-hover:from-sky group-hover:to-sky"
                     className="h-6 w-6"
                   />
 

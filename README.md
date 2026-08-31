@@ -4,8 +4,10 @@ A modern, animated marketing website for **Bilic Cleaning Company**, a professio
 
 > _Clean Spaces. Better Living. Better Business._
 
-**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Framer Motion · lucide-react
-No database, no backend, no login — every page is static and fast.
+**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Framer Motion · lucide-react · Resend · Supabase · react-markdown
+Most pages are still static. A database-backed blog, a password-protected admin
+portal, and the quote form (which saves to the database and emails both the
+owner and the customer) all need the env vars in §10 to work.
 
 ---
 
@@ -28,7 +30,8 @@ marked with a `// TODO:` or `[Insert ...]` in the code. Work top to bottom.
 | 10 | **Before / after photos** | `data/content.ts` → `beforeAfter.before` / `beforeAfter.after` | Two unrelated stock rooms right now. Use the **same room, same angle, same lighting** or the slider looks dishonest. |
 | 11 | **Testimonials** | `data/content.ts` → `testimonials` | Three realistic placeholders with `[Insert Client Name]`. **Do not publish invented reviews as real** — get permission and use real quotes. |
 | 12 | **Map pin** | `data/content.ts` → `mapEmbed.src` | Currently a general Mogadishu view. Google Maps → search your address → Share → **Embed a map** → copy the `src`. |
-| 13 | **Contact form delivery** | `components/ContactSection.tsx` | Front-end only — submitting sends nothing anywhere. See §4. |
+| 13 | **Contact form delivery** | `.env.local` (create it) | The form already sends real email via Resend and saves to Supabase — you just need to add your own env vars. See §4 and §10. |
+| 14 | **Database + admin password** | `.env.local` (create it) | Run the SQL in §10.1, then set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `ADMIN_PASSWORD`. Nothing in the blog or `/admin` works without these. |
 
 ---
 
@@ -84,6 +87,10 @@ That file holds, clearly labelled and in order:
 The site is **English only**. There is no language switcher and no translation layer.
 
 Change the text there and it updates everywhere on the site — home page, inner pages and footer.
+
+**The one exception is the blog.** Blog posts live in the Supabase
+`blog_posts` table, not in this file — write and publish them from `/admin`
+instead (see §10.5).
 
 ### Icons
 
@@ -209,17 +216,26 @@ Unsplash **and Pexels** are allowed in `next.config.mjs` via `remotePatterns`. O
 
 ### Contact form
 
-The quote form in `components/ContactSection.tsx` is **front-end only** for now — submitting it shows a success message and nothing is sent anywhere. Look for:
+The "Request a Free Quote" form in `components/ContactSection.tsx` POSTs
+`name`, `phone`, `email`, `service` and `message` as JSON (plus a hidden
+`company` honeypot field for spam) to `app/api/quote/route.ts`, which — in
+order — saves it to Supabase (so it shows up in `/admin`), emails the owner
+via [Resend](https://resend.com), then emails the customer an automatic
+thank-you if they gave an email address. The button shows a "Sending…" state
+while the request is in flight, and a friendly success or error message
+depending on the result. On error, whatever the visitor typed is kept so they
+can just hit send again.
 
-```ts
-// TODO: connect form to email/WhatsApp.
-```
+**Full setup (Resend + Supabase) is in [§10 below](#10-database-blog--admin-portal).**
+The short version: create a free Resend account and a free Supabase project,
+run the SQL in §10, copy `.env.example` to `.env.local` and fill in the six
+env vars, then add the same six in Vercel → Project → Settings → Environment
+Variables before deploying.
 
-Three easy ways to wire it up later:
-
-- **WhatsApp** — build a message string and open `${contact.whatsappHref}?text=${encodeURIComponent(...)}`
-- **Email** — add a Next.js route handler (`app/api/contact/route.ts`) using Resend or Nodemailer
-- **A form service** — point the `<form>` at Formspree / Getform, no backend code needed
+If Resend doesn't work for you, the simplest no-backend alternative for the
+owner-notification email is [Web3Forms](https://web3forms.com) — though
+you'd then need to save to Supabase separately, since that part no longer
+goes through Resend.
 
 ---
 
@@ -227,15 +243,31 @@ Three easy ways to wire it up later:
 
 ```
 app/
-  layout.tsx        Fonts, metadata, Navbar, Footer, floating WhatsApp button
+  layout.tsx        Fonts, metadata; renders SiteChrome around every page
   page.tsx          Home page — composes the sections in order
   about/page.tsx    About Us
   services/page.tsx Full services listing (with anchors per service)
   contact/page.tsx  Contact page
+  blog/page.tsx     Blog listing — published posts, newest first
+  blog/[slug]/      Single blog post (Markdown body)
+  admin/            Password-protected admin portal — see §10
+  api/quote/        Saves + emails a quote request (see §4 and §10)
+  api/admin/        Admin login/logout + quote reply + blog CRUD (see §10)
   not-found.tsx     404 page
   globals.css       Tailwind + base styles + reduced-motion rules
 
+middleware.ts       Protects every /admin page and /api/admin/* route
+
+lib/
+  supabase.ts       The one Supabase client (server-only, secret key)
+  admin-auth.ts     The admin password/cookie check, shared by the login
+                     route and middleware.ts
+  email.ts          Shared escapeHtml() + brandedEmailHtml() for every outgoing email
+  format.ts         formatDate(), slugify(), customerWhatsAppLink()
+  useToast.ts        Tiny local-toast hook used by the admin portal
+
 components/
+  SiteChrome.tsx      Navbar/Footer/WhatsApp button — hidden under /admin
   Navbar.tsx          Sticky nav, blur-on-scroll, active-link underline
   Footer.tsx          Navy footer with links + contact details
   Hero.tsx            Gradient-mesh hero, floating shapes, trust row, wave divider
@@ -245,7 +277,7 @@ components/
   ServicesSection.tsx 10 service cards, each with a photo thumbnail
   BeforeAfter.tsx     Draggable before/after comparison slider
   WhyChoose.tsx       7 reason cards
-  ProcessTimeline.tsx 8-step snake chart — ONE list, restyled per breakpoint
+  ProcessTimeline.tsx 8-step vertical timeline — ONE list, restyled per breakpoint
   Testimonials.tsx    3 client quotes; auto-rotating carousel on mobile
   Industries.tsx      4 image banners + keyword chips
   VisionValues.tsx    Vision, mission + 7 core values
@@ -255,9 +287,16 @@ components/
   ContactSection.tsx  Contact details + quote form
   WhatsAppButton.tsx  Floating WhatsApp button (pre-filled message)
   ScrollProgress.tsx  Thin accent bar showing scroll position
+  MarkdownContent.tsx Renders a blog post's Markdown with brand typography
+  admin/
+    AdminHeader.tsx          Navy top bar: tab nav (Quote Requests / Blog Posts) + log out
+    QuoteRequestsView.tsx    Stat cards + responsive list + the detail/reply modal
+    BlogPostsList.tsx        Responsive list with status pills + Edit/Delete
+    BlogPostForm.tsx         The New Post / Edit Post form (shared), with cover preview
+    Toast.tsx                The small bottom-corner success/error notification
   ui/
     AnimatedIcon.tsx   All icon motion (entrance spring, hover, float)
-    Button.tsx         Shared button (4 variants)
+    Button.tsx         Shared button (5 variants, plus a `loading` spinner state)
     Card.tsx           Shared white card with hover lift
     Icon.tsx           Name → lucide icon lookup
     Reveal.tsx         The standard scroll-reveal animation
@@ -331,5 +370,145 @@ never leave the number stranded part-way.
 
 1. Push this folder to a GitHub repository.
 2. Go to [vercel.com/new](https://vercel.com/new) and import the repo.
-3. Vercel detects Next.js automatically — no configuration needed. Click **Deploy**.
-4. After deploying, update `site.url` in `data/content.ts` to your real domain so the SEO metadata is correct.
+3. Add every env var from §10 below in the Vercel import screen (or after,
+   under Project → Settings → Environment Variables) — the site builds fine
+   without them, but the quote form, blog and admin portal all need them at
+   runtime.
+4. Vercel detects Next.js automatically — no other configuration needed. Click **Deploy**.
+5. After deploying, update `site.url` in `data/content.ts` to your real domain so the SEO metadata is correct.
+
+---
+
+## 10. Database, blog & admin portal
+
+Three things run on this: **Supabase** (a free hosted Postgres database) holds
+quote requests and blog posts, **Resend** (already set up in §4) sends email,
+and a single password protects `/admin`.
+
+### 10.1 Create the database tables
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Open your project → **SQL Editor** → **New query**, paste the SQL below, and run it.
+
+```sql
+-- Quote requests submitted through the contact form
+create table quote_requests (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  phone text not null,
+  email text,
+  service text not null,
+  message text not null,
+  status text not null default 'new',   -- 'new' | 'replied'
+  created_at timestamptz not null default now()
+);
+
+-- Blog posts
+create table blog_posts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  slug text not null unique,
+  excerpt text,
+  cover_image text,
+  body_markdown text not null,
+  published boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+```
+
+3. Get your project's API values:
+   - **Project URL** (Project Settings → API) → `NEXT_PUBLIC_SUPABASE_URL`
+   - **Secret key** → Supabase Dashboard → **Settings → API Keys → API Keys
+     tab → Secret keys** (click **Create new API keys** first if you don't
+     have one yet) → `SUPABASE_SECRET_KEY`. This `sb_secret_...` key is
+     Supabase's current server-side key, replacing the older `service_role`
+     key. The legacy `service_role` key still works — this project falls
+     back to it automatically if `SUPABASE_SECRET_KEY` isn't set (see
+     `lib/supabase.ts`) — but Supabase is deprecating it (end of 2026), so
+     new projects should use the secret key.
+
+   ⚠️ **This key bypasses every permission check in the database.** It is
+   read only by `lib/supabase.ts`, which is only ever imported from server
+   code (route handlers, server components, middleware) — never from a
+   `"use client"` component. Never put it in `NEXT_PUBLIC_*`, never log it,
+   and if it ever leaks, roll it in Supabase immediately.
+
+### 10.2 All the env vars, in one place
+
+Set all six locally in `.env.local` (copy `.env.example` to start) **and** in
+Vercel → Project → Settings → Environment Variables before deploying —
+they're two separate places and both need every value. If you're also
+running this on Cloudflare (Pages/Workers), add the same values there under
+**Settings → Variables and Secrets**, marking `SUPABASE_SECRET_KEY` as an
+encrypted **Secret** (not a plain variable).
+
+| Variable | Where to get it | Notes |
+| --- | --- | --- |
+| `RESEND_API_KEY` | resend.com → API Keys | |
+| `QUOTE_TO_EMAIL` | your own business inbox | Receives new quote requests |
+| `QUOTE_FROM_EMAIL` | resend.com → Domains | `onboarding@resend.dev` for testing; see caveat below for production |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API | Not secret, but only read server-side here |
+| `SUPABASE_SECRET_KEY` | Supabase → Settings → API Keys → Secret keys | **Secret — server only, never exposed to the browser.** Mark it encrypted wherever you set it (Vercel/Cloudflare). |
+| `ADMIN_PASSWORD` | pick your own | The one password that unlocks `/admin` |
+
+### 10.3 The Resend domain-verification caveat
+
+Resend's test sender `onboarding@resend.dev` can **only deliver to the email
+address of the Resend account owner** — that's a Resend restriction, not a
+bug here. In practice that means:
+
+- The owner-notification email (to `QUOTE_TO_EMAIL`) works immediately if
+  `QUOTE_TO_EMAIL` *is* the Resend account owner's address.
+- The **customer auto-reply** (sent right after they submit the form) and
+  the **admin's reply-to-customer email** (sent from `/admin`) will not
+  reach any other real customer inbox until you verify your own domain:
+  1. Resend → **Domains** → **Add Domain** → enter your domain.
+  2. Resend shows a set of DNS records (SPF/DKIM, etc.) — add exactly those
+     in **Cloudflare → DNS** for that domain (Cloudflare is where this
+     project's DNS is managed).
+  3. Wait for Resend to show the domain as **Verified**, then set
+     `QUOTE_FROM_EMAIL` to an address on it, e.g. `quotes@bilic.com`.
+- Until then: the customer auto-reply fails **silently** (logged only —
+  never shown to the visitor, so a lead is never lost over it), but the
+  **admin reply is different** — if it fails to send, the admin sees a
+  clear error in `/admin` and the typed message is kept so they can retry.
+  Either way, nothing crashes: every Resend call is wrapped in try/catch.
+
+### 10.4 The blog
+
+- Public pages (`/blog`, `/blog/[slug]`) only ever show posts where
+  `published = true`, fetched server-side straight from Supabase — nothing
+  Supabase-related ships to the browser.
+- A missing slug and an unpublished slug both render the normal 404 page.
+- Cover images are plain URLs typed into the admin form, so
+  `next.config.mjs` allows `next/image` to load from any HTTPS host (see the
+  comment there). If you'd rather lock that down, host cover images
+  somewhere specific and narrow `remotePatterns` to that host.
+
+### 10.5 The admin portal
+
+Go to `/admin`, log in with `ADMIN_PASSWORD`.
+
+- **Quote Requests** — stat cards for Total / New / Replied, then every
+  submission newest-first as a responsive list (stacks into cards on a
+  phone). Click one to open the full request in a modal: the message,
+  quick call/email/WhatsApp links, and either a reply box (emails the
+  customer via Resend and marks the row **Replied** — see the domain
+  caveat above for reaching real customers) or, if they left no email, a
+  **Reply on WhatsApp** button built from their phone number. **Mark as
+  Replied** is always available too, for requests handled by phone.
+- **Blog Posts** — every post, published or draft, as the same kind of
+  responsive list. **New Post** opens a plain form: title, an
+  auto-generated (editable) slug, excerpt, a cover image URL (with a small
+  live preview), the body as Markdown in a plain textarea, and a Published
+  toggle. Edit and Delete work the same way from the list.
+
+**How the login works:** one password (`ADMIN_PASSWORD`), no user accounts.
+Logging in sets an `httpOnly` cookie holding a hash of the password (never
+the password itself); `middleware.ts` checks that cookie on every `/admin`
+page and `/api/admin/*` request and bounces anyone without it to
+`/admin/login`. This is intentionally simple because there's a single owner
+— if the team ever grows, swap this for
+[Supabase Auth](https://supabase.com/docs/guides/auth) (email/password or
+magic links, with per-user rows) instead of adding more passwords.

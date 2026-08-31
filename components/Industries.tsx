@@ -17,10 +17,13 @@ export default function Industries() {
 
         <div className="grid gap-7 md:grid-cols-2">
           {industries.map((industry, index) => (
-            <Reveal key={industry.title} delay={index * 0.08}>
-              <div className="group h-full overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-sky/30 hover:shadow-lift">
-                {/* ---------- Image banner with the title on top ---------- */}
-                <div className="relative aspect-[16/7] w-full overflow-hidden">
+            <Reveal key={industry.title} delay={index * 0.08} className="h-full">
+              <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-sky/30 hover:shadow-lift">
+                {/* ---------- Image banner with the title on top ----------
+                    Fixed aspect ratio keeps every card's image the same
+                    height regardless of column width, so the grid reads
+                    even even when the chip counts below differ. */}
+                <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
                   {/* TODO: replace with a real Bilic Cleaning photo (see data/content.ts). */}
                   <Image
                     src={industry.image}
@@ -47,12 +50,15 @@ export default function Industries() {
                   </div>
                 </div>
 
-                {/* ---------- Chips ---------- */}
-                <div className="flex flex-wrap gap-2 p-6">
+                {/* ---------- Chips ----------
+                    `flex-1` lets this area grow to fill any leftover space
+                    so cards with fewer chips still match the height of a
+                    taller sibling in the same row. */}
+                <div className="flex flex-1 flex-wrap content-start gap-2 p-6">
                   {industry.items.map((item) => (
                     <span
                       key={item}
-                      className="rounded-full bg-offwhite px-3.5 py-1.5 text-xs font-medium text-navy transition-colors duration-300 group-hover:bg-sky/10"
+                      className="rounded-full bg-offwhite px-3.5 py-1.5 text-xs font-medium text-navy transition-colors duration-300 group-hover:bg-sky/10 hover:!bg-sky/20"
                     >
                       {item}
                     </span>

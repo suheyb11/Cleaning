@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import ScrollProgress from "@/components/ScrollProgress";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import SiteChrome from "@/components/SiteChrome";
 import { site } from "@/data/content";
 import "./globals.css";
 
@@ -63,21 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable}`}>
       <body className="flex min-h-screen flex-col">
-        {/* Skip link so keyboard users can jump past the navigation. */}
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-sky focus:px-4 focus:py-2 focus:font-semibold focus:text-white"
-        >
-          Skip to content
-        </a>
-
-        <ScrollProgress />
-        <Navbar />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <WhatsAppButton />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
