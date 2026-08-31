@@ -11,8 +11,9 @@ export const dynamic = "force-dynamic";
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const { status } = (await request.json().catch(() => ({}))) as {
     status?: "new" | "replied";
   };
@@ -27,7 +28,7 @@ export async function PATCH(
   const { error } = await getSupabase()
     .from("quote_requests")
     .update({ status })
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (error) {
     console.error("Failed to update quote request status:", error);

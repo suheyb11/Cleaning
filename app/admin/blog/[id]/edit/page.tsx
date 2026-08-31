@@ -8,12 +8,13 @@ export const dynamic = "force-dynamic";
 export default async function EditBlogPostPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const { data, error } = await getSupabase()
     .from("blog_posts")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .maybeSingle();
 
   if (error || !data) notFound();

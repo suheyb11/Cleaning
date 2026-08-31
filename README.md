@@ -4,7 +4,7 @@ A modern, animated marketing website for **Bilic Cleaning Company**, a professio
 
 > _Clean Spaces. Better Living. Better Business._
 
-**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · Framer Motion · lucide-react · Resend · Supabase · react-markdown
+**Stack:** Next.js 15 (App Router) · TypeScript · Tailwind CSS · Framer Motion · lucide-react · Resend · Supabase · react-markdown
 Most pages are still static. A database-backed blog, a password-protected admin
 portal, and the quote form (which saves to the database and emails both the
 owner and the customer) all need the env vars in §10 to work.
@@ -376,6 +376,35 @@ never leave the number stranded part-way.
    runtime.
 4. Vercel detects Next.js automatically — no other configuration needed. Click **Deploy**.
 5. After deploying, update `site.url` in `data/content.ts` to your real domain so the SEO metadata is correct.
+
+### 9.1 Deploying to Cloudflare (Workers, via OpenNext)
+
+Cloudflare runs this through the [OpenNext](https://opennext.js.org/cloudflare)
+adapter (`@opennextjs/cloudflare`), which needs **Next.js 15+**. The adapter and
+its config are committed to the repo:
+
+- `open-next.config.ts` — adapter config (defaults; nothing to change)
+- `wrangler.jsonc` — Worker name, `compatibility_date`, and the `nodejs_compat`
+  flag (required)
+
+In the Cloudflare dashboard → **Workers & Pages → the project → Settings →
+Build**, set:
+
+| Setting          | Value                                                              |
+| ---------------- | ----------------------------------------------------------------- |
+| Build command    | `npm run build`                                                    |
+| Deploy command   | `npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy` (or `npm run deploy`) |
+
+Add the same env vars from §10 under **Settings → Variables and Secrets** (mark
+`SUPABASE_SECRET_KEY`, `RESEND_API_KEY` and `ADMIN_PASSWORD` as encrypted/secret).
+
+To test the exact Cloudflare build locally before pushing:
+
+```bash
+npm run build                    # plain Next build
+npx opennextjs-cloudflare build  # what Cloudflare actually runs
+npm run preview                  # optional: run the built Worker locally
+```
 
 ---
 

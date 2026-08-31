@@ -26,3 +26,8 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// Gives `next dev` access to the Cloudflare Workers runtime bindings so local
+// development matches the OpenNext deploy. No-op in production builds.
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+initOpenNextCloudflareForDev();

@@ -16,8 +16,9 @@ type BlogPostBody = {
 /** Updates a blog post. Protected by middleware.ts (/api/admin/* requires the admin cookie). */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const body = (await request.json().catch(() => ({}))) as BlogPostBody;
 
   if (!body.title?.trim() || !body.slug?.trim() || !body.body_markdown?.trim()) {
@@ -38,7 +39,7 @@ export async function PATCH(
       published: Boolean(body.published),
       updated_at: new Date().toISOString(),
     })
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (error) {
     console.error("Failed to update blog post:", error);
@@ -55,9 +56,10 @@ export async function PATCH(
 /** Deletes a blog post. Protected by middleware.ts (/api/admin/* requires the admin cookie). */
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { error } = await getSupabase().from("blog_posts").delete().eq("id", params.id);
+  const { id } = await params;
+  const { error } = await getSupabase().from("blog_posts").delete().eq("id", id);
 
   if (error) {
     console.error("Failed to delete blog post:", error);

@@ -13,8 +13,9 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   const { message } = (await request.json().catch(() => ({}))) as {
     message?: string;
   };
@@ -31,7 +32,7 @@ export async function POST(
   const { data: quoteRequest, error: fetchError } = await supabase
     .from("quote_requests")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .maybeSingle();
 
   if (fetchError || !quoteRequest) {
@@ -95,7 +96,7 @@ export async function POST(
   const { error: updateError } = await supabase
     .from("quote_requests")
     .update({ status: "replied" })
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (updateError) {
     console.error("Failed to mark quote request as replied:", updateError);

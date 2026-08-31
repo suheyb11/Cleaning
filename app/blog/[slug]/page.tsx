@@ -29,9 +29,10 @@ async function getPublishedPost(slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const post = await getPublishedPost(params.slug);
+  const { slug } = await params;
+  const post = await getPublishedPost(slug);
   if (!post) return { title: "Post not found" };
 
   return {
@@ -43,9 +44,10 @@ export async function generateMetadata({
 export default async function BlogPostPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const post = await getPublishedPost(params.slug);
+  const { slug } = await params;
+  const post = await getPublishedPost(slug);
 
   // Covers both a slug that doesn't exist and one that exists but is
   // unpublished — either way, this reader shouldn't see it.
