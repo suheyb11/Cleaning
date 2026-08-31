@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import BlogPostForm from "@/components/admin/BlogPostForm";
-import { supabase, type BlogPost } from "@/lib/supabase";
+import { getSupabase, type BlogPost } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ export default async function EditBlogPostPage({
 }: {
   params: { id: string };
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("blog_posts")
     .select("*")
     .eq("id", params.id)

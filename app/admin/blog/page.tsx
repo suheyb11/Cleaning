@@ -1,12 +1,12 @@
 import BlogPostsList from "@/components/admin/BlogPostsList";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
-import { supabase, type BlogPost } from "@/lib/supabase";
+import { getSupabase, type BlogPost } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 async function getAllPosts() {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("blog_posts")
     .select("*")
     .order("created_at", { ascending: false });

@@ -7,12 +7,12 @@ import Icon from "@/components/ui/Icon";
 import Reveal from "@/components/ui/Reveal";
 import MarkdownContent from "@/components/MarkdownContent";
 import { formatDate } from "@/lib/format";
-import { supabase, type BlogPost } from "@/lib/supabase";
+import { getSupabase, type BlogPost } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 async function getPublishedPost(slug: string) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)

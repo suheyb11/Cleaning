@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { brandedEmailHtml, escapeHtml } from "@/lib/email";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Sends the owner's reply to a quote request by email and marks it
@@ -23,6 +25,8 @@ export async function POST(
       { status: 400 },
     );
   }
+
+  const supabase = getSupabase();
 
   const { data: quoteRequest, error: fetchError } = await supabase
     .from("quote_requests")

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 type BlogPostBody = {
   title?: string;
@@ -25,7 +27,7 @@ export async function PATCH(
     );
   }
 
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("blog_posts")
     .update({
       title: body.title.trim(),
@@ -55,7 +57,7 @@ export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } },
 ) {
-  const { error } = await supabase.from("blog_posts").delete().eq("id", params.id);
+  const { error } = await getSupabase().from("blog_posts").delete().eq("id", params.id);
 
   if (error) {
     console.error("Failed to delete blog post:", error);

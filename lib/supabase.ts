@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Server-only Supabase client, authenticated with the secret key.
@@ -11,15 +11,29 @@ import { createClient } from "@supabase/supabase-js";
  * key). SUPABASE_SERVICE_ROLE_KEY is the old name it replaces — still
  * supported here as a fallback so nothing breaks mid-migration, but new
  * setups should use SUPABASE_SECRET_KEY (see README).
+ *
+ * The client is created lazily on first use rather than at import time, so
+ * simply importing this module during the build (when env vars aren't
+ * available) never throws.
  */
-const supabaseSecret =
-  process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+let client: SupabaseClient | null = null;
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  supabaseSecret!,
-  { auth: { persistSession: false } },
-);
+export function getSupabase(): SupabaseClient {
+  if (client) return client;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    throw new Error(
+      "Missing Supabase env vars (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SECRET_KEY).",
+    );
+  }
+
+  client = createClient(url, key, { auth: { persistSession: false } });
+  return client;
+}
 
 export type QuoteRequest = {
   id: string;

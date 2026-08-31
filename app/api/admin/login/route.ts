@@ -6,6 +6,8 @@ import {
   isCorrectAdminPassword,
 } from "@/lib/admin-auth";
 
+export const dynamic = "force-dynamic";
+
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function POST(request: Request) {

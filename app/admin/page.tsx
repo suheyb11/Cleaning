@@ -1,10 +1,10 @@
 import QuoteRequestsView from "@/components/admin/QuoteRequestsView";
-import { supabase, type QuoteRequest } from "@/lib/supabase";
+import { getSupabase, type QuoteRequest } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 async function getQuoteRequests() {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("quote_requests")
     .select("*")
     .order("created_at", { ascending: false });

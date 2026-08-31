@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Updates a quote request's status directly — used by "Mark as Replied" for
@@ -22,7 +24,7 @@ export async function PATCH(
     );
   }
 
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("quote_requests")
     .update({ status })
     .eq("id", params.id);

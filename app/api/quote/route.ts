@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { brandedEmailHtml, escapeHtml } from "@/lib/email";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Handles the "Request a Free Quote" form. On a valid submission, in order:
@@ -101,7 +103,7 @@ export async function POST(request: Request) {
 
   // ---------- 1. Save to the database (best-effort — see file header) ----------
   try {
-    const { error } = await supabase.from("quote_requests").insert({
+    const { error } = await getSupabase().from("quote_requests").insert({
       name,
       phone,
       email: email || null,

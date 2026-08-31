@@ -6,7 +6,7 @@ import PageHeader from "@/components/PageHeader";
 import Icon from "@/components/ui/Icon";
 import Reveal from "@/components/ui/Reveal";
 import { formatDate } from "@/lib/format";
-import { supabase, type BlogPost } from "@/lib/supabase";
+import { getSupabase, type BlogPost } from "@/lib/supabase";
 
 // The list of posts lives in Supabase, not in the build — never prerender
 // a stale copy at build time.
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 async function getPublishedPosts() {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("blog_posts")
     .select("*")
     .eq("published", true)

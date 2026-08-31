@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 type BlogPostBody = {
   title?: string;
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { error } = await supabase.from("blog_posts").insert({
+  const { error } = await getSupabase().from("blog_posts").insert({
     title: body.title.trim(),
     slug: body.slug.trim(),
     excerpt: body.excerpt || null,
