@@ -85,11 +85,11 @@ export default function AdminShell({
 
       {/* Sidebar — always visible on desktop, a slide-in overlay on mobile */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 -translate-x-full flex-col bg-navy transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 -translate-x-full flex-col overflow-hidden bg-navy transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${
           mobileNavOpen ? "translate-x-0" : ""
         }`}
       >
-        <div className="flex items-center gap-2.5 px-5 py-5">
+        <div className="flex shrink-0 items-center gap-2.5 px-5 py-5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky text-white">
             <Icon name="ShieldCheck" className="h-5 w-5" />
           </span>
@@ -109,13 +109,16 @@ export default function AdminShell({
         <button
           type="button"
           onClick={openCompose}
-          className="mx-4 mb-5 inline-flex items-center justify-center gap-2 rounded-xl bg-sky px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-skyDark"
+          className="mx-4 mb-5 inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-sky px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-skyDark"
         >
           <Icon name="Pencil" className="h-4 w-4" />
           Compose
         </button>
 
-        <nav className="flex-1 space-y-1 px-3" aria-label="Admin sections">
+        <nav
+          className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3"
+          aria-label="Admin sections"
+        >
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -141,15 +144,27 @@ export default function AdminShell({
           ))}
         </nav>
 
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="mx-3 mb-4 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
-        >
-          <Icon name="X" className="h-4 w-4" />
-          Log out
-        </button>
+        {/* Account footer — always its own row, never squeezed by the nav above. */}
+        <div className="shrink-0 border-t border-white/10 p-3">
+          <div className="flex items-center gap-2.5 rounded-xl px-2 py-2">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">
+              A
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm font-medium text-white/90">
+              Admin
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              aria-label="Log out"
+              title="Log out"
+              className="shrink-0 rounded-lg p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-60"
+            >
+              <Icon name="LogOut" className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </aside>
 
       <main className="min-h-0 min-w-0 flex-1">{children}</main>

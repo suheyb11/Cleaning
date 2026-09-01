@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Toast from "@/components/admin/Toast";
+import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import { formatDate } from "@/lib/format";
 import type { BlogPost } from "@/lib/supabase";
@@ -13,7 +15,7 @@ import { useToast } from "@/lib/useToast";
 function StatusPill({ published }: { published: boolean }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
+      className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
         published ? "bg-emerald-50 text-emerald-700" : "bg-navy/5 text-muted"
       }`}
     >
@@ -25,7 +27,14 @@ function StatusPill({ published }: { published: boolean }) {
 export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const { toast, showToast } = useToast();
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return posts;
+    return posts.filter((post) => post.title.toLowerCase().includes(q));
+  }, [posts, query]);
 
   async function handleDelete(post: BlogPost) {
     if (!window.confirm(`Delete "${post.title}"? This can't be undone.`)) {
@@ -58,74 +67,118 @@ export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-navy/10 bg-white p-12 text-center shadow-soft">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-navy/10 bg-white p-14 text-center shadow-soft">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky/10 text-sky">
           <Icon name="FileText" className="h-7 w-7" />
         </span>
         <p className="font-semibold text-navy">No posts yet</p>
         <p className="mt-1 text-sm text-muted">
-          Create your first one to see it here.
+          Write your first post to see it here.
         </p>
+        <Button href="/admin/blog/new" className="mt-5">
+          <Icon name="Pencil" className="h-4 w-4" />
+          Create your first post
+        </Button>
       </div>
     );
   }
 
   return (
     <div>
-      <ul className="divide-y divide-navy/5 overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-soft">
-        <li
-          aria-hidden="true"
-          className="hidden bg-offwhite/60 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted sm:grid sm:grid-cols-[1.8fr_0.8fr_0.9fr_0.9fr]"
-        >
-          <span>Title</span>
-          <span>Status</span>
-          <span>Date</span>
-          <span>Actions</span>
-        </li>
+      <div className="relative mb-4 max-w-xs">
+        <Icon
+          name="Search"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+        />
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search posts by title…"
+          className="w-full rounded-xl border border-navy/15 bg-white py-2 pl-9 pr-3 text-sm text-ink transition-colors focus:border-sky focus:outline-none"
+        />
+      </div>
 
-        {posts.map((post) => (
-          <li key={post.id}>
-            <div className="flex flex-col gap-2.5 px-5 py-4 sm:grid sm:grid-cols-[1.8fr_0.8fr_0.9fr_0.9fr] sm:items-center sm:gap-4">
-              <span className="font-semibold text-navy">{post.title}</span>
+      {filtered.length === 0 ? (
+        <div className="rounded-2xl border border-navy/10 bg-white p-10 text-center text-sm text-muted shadow-soft">
+          No posts match &ldquo;{query}&rdquo;.
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {filtered.map((post) => (
+            <li
+              key={post.id}
+              className="flex items-center gap-4 rounded-2xl border border-navy/10 bg-white p-3 shadow-soft transition-shadow hover:shadow-lift sm:p-4"
+            >
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-offwhite sm:h-20 sm:w-20">
+                {post.cover_image ? (
+                  <Image
+                    src={post.cover_image}
+                    alt=""
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-sky/10 text-sky">
+                    <Icon name="Image" className="h-6 w-6" />
+                  </div>
+                )}
+              </div>
 
-              <span className="flex items-center justify-between gap-3 sm:block">
-                <span className="text-xs font-medium uppercase tracking-wide text-muted sm:hidden">
-                  Status
-                </span>
-                <StatusPill published={post.published} />
-              </span>
-
-              <span className="flex items-center justify-between gap-3 sm:block">
-                <span className="text-xs font-medium uppercase tracking-wide text-muted sm:hidden">
-                  Date
-                </span>
-                <span className="text-sm text-muted">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="truncate font-semibold text-navy">
+                    {post.title}
+                  </span>
+                  <StatusPill published={post.published} />
+                </div>
+                <p className="mt-0.5 truncate text-sm text-muted">
+                  {post.excerpt || "No excerpt"}
+                </p>
+                <p className="mt-1 text-xs text-muted">
                   {formatDate(post.created_at)}
-                </span>
-              </span>
+                </p>
+              </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex shrink-0 items-center gap-1">
+                {post.published && (
+                  <a
+                    href={`/blog/${post.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View on site"
+                    title="View on site"
+                    className="rounded-xl p-2 text-muted transition-colors hover:bg-sky/10 hover:text-sky"
+                  >
+                    <Icon name="Eye" className="h-4 w-4" />
+                  </a>
+                )}
                 <Link
                   href={`/admin/blog/${post.id}/edit`}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky hover:underline"
+                  aria-label="Edit"
+                  title="Edit"
+                  className="rounded-xl p-2 text-muted transition-colors hover:bg-sky/10 hover:text-sky"
                 >
-                  <Icon name="Pencil" className="h-3.5 w-3.5" />
-                  Edit
+                  <Icon name="Pencil" className="h-4 w-4" />
                 </Link>
                 <button
                   type="button"
                   onClick={() => handleDelete(post)}
                   disabled={deletingId === post.id}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:underline disabled:opacity-60"
+                  aria-label="Delete"
+                  title="Delete"
+                  className="rounded-xl p-2 text-muted transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
                 >
-                  <Icon name="Trash2" className="h-3.5 w-3.5" />
-                  {deletingId === post.id ? "Deleting…" : "Delete"}
+                  <Icon
+                    name={deletingId === post.id ? "Loader2" : "Trash2"}
+                    className={`h-4 w-4 ${deletingId === post.id ? "animate-spin" : ""}`}
+                  />
                 </button>
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <Toast toast={toast} />
     </div>

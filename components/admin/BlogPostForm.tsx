@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+import Toast from "@/components/admin/Toast";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import { slugify } from "@/lib/format";
 import type { BlogPost } from "@/lib/supabase";
+import { useToast } from "@/lib/useToast";
 
 const fieldClasses =
   "w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 transition-colors focus:border-sky focus:outline-none";
@@ -27,6 +29,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
   const [published, setPublished] = useState(post?.published ?? false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast, showToast } = useToast();
 
   function handleTitleChange(value: string) {
     setTitle(value);
@@ -69,10 +72,17 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
         throw new Error(data.error || "Could not save the post.");
       }
 
-      router.push("/admin/blog");
-      router.refresh();
+      showToast("success", isEditing ? "Post updated." : "Post created.");
+      // Brief pause so the success toast is visible before the list swaps in.
+      setTimeout(() => {
+        router.push("/admin/blog");
+        router.refresh();
+      }, 700);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save the post.");
+      const message =
+        err instanceof Error ? err.message : "Could not save the post.";
+      setError(message);
+      showToast("error", message);
       setSaving(false);
     }
   }
@@ -80,7 +90,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-2xl space-y-5 rounded-2xl border border-navy/10 bg-white p-6 shadow-soft sm:p-8"
+      className="max-w-2xl space-y-6 rounded-2xl border border-navy/10 bg-white p-6 shadow-soft sm:p-8"
     >
       <div>
         <label htmlFor="title" className={labelClasses}>
@@ -166,7 +176,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
         </label>
         <textarea
           id="body"
-          rows={16}
+          rows={18}
           value={bodyMarkdown}
           onChange={(event) => setBodyMarkdown(event.target.value)}
           placeholder={"## A heading\n\nWrite the post in Markdown — **bold**, *italic*, lists, links…"}
@@ -174,7 +184,13 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
         />
       </div>
 
-      <label className="flex items-center gap-3 text-sm font-medium text-navy">
+      <label className="flex items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-offwhite/60 px-4 py-3.5">
+        <span className="text-sm font-medium text-navy">
+          Published{" "}
+          <span className="font-normal text-muted">
+            — visible on the public blog
+          </span>
+        </span>
         <span
           className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
             published ? "bg-sky" : "bg-navy/15"
@@ -192,8 +208,6 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
             }`}
           />
         </span>
-        Published{" "}
-        <span className="font-normal text-muted">(visible on the public blog)</span>
       </label>
 
       {error && (
@@ -215,6 +229,8 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
           Cancel
         </Button>
       </div>
+
+      <Toast toast={toast} />
     </form>
   );
 }

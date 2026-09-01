@@ -20,6 +20,8 @@ async function getAllPosts() {
 
 export default async function AdminBlogPage() {
   const posts = await getAllPosts();
+  const publishedCount = posts.filter((post) => post.published).length;
+  const draftCount = posts.length - publishedCount;
 
   return (
     <div className="h-full overflow-y-auto">
@@ -30,7 +32,9 @@ export default async function AdminBlogPage() {
               Blog Posts
             </h1>
             <p className="text-sm text-muted">
-              {posts.length} post{posts.length === 1 ? "" : "s"} total.
+              {posts.length} post{posts.length === 1 ? "" : "s"} ·{" "}
+              {publishedCount} published · {draftCount} draft
+              {draftCount === 1 ? "" : "s"}
             </p>
           </div>
 
