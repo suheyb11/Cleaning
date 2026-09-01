@@ -14,7 +14,7 @@
     // TODO: confirm Supabase URL
     "NEXT_PUBLIC_SUPABASE_URL": "https://qmtlrumlcmgusemgyobs.supabase.co",
     "QUOTE_TO_EMAIL": "suheyb0102@gmail.com",
-    "QUOTE_FROM_EMAIL": "quotes@bilic.com"
+    "QUOTE_FROM_EMAIL": "onboarding@resend.dev"
   },
   "assets": {
     "directory": ".open-next/assets",
