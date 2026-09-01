@@ -88,9 +88,9 @@ export default function QuoteRequestsView({
       <div
         className={`${
           active ? "hidden" : "flex"
-        } h-full min-h-0 w-full flex-col border-r border-navy/10 bg-white md:flex md:w-[360px] md:shrink-0`}
+        } h-full min-h-0 w-full flex-col border-r border-gray-200 bg-white md:flex md:w-[360px] md:shrink-0`}
       >
-        <div className="shrink-0 border-b border-navy/10 px-5 py-4">
+        <div className="shrink-0 border-b border-gray-200 px-5 py-4">
           <h1 className="text-lg font-semibold text-navy">Inbox</h1>
           <p className="mt-0.5 text-xs text-muted">
             {requests.length} request{requests.length === 1 ? "" : "s"}
@@ -105,7 +105,7 @@ export default function QuoteRequestsView({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search name, service, email…"
-              className="w-full rounded-xl border border-navy/15 bg-offwhite/60 py-2 pl-9 pr-3 text-sm text-ink transition-colors focus:border-sky focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-ink transition-colors hover:border-gray-300 focus:border-sky focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky"
             />
           </div>
         </div>
@@ -122,13 +122,13 @@ export default function QuoteRequestsView({
               }
             />
           ) : (
-            <ul className="divide-y divide-navy/5">
+            <ul className="divide-y divide-gray-200">
               {filtered.map((request) => (
                 <li key={request.id}>
                   <button
                     type="button"
                     onClick={() => setActiveId(request.id)}
-                    className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-offwhite ${
+                    className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-gray-50 ${
                       activeId === request.id ? "bg-sky/5" : ""
                     }`}
                   >
@@ -277,7 +277,7 @@ function RequestReadingPane({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
-      <div className="shrink-0 border-b border-navy/10 px-5 py-4 sm:px-7">
+      <div className="shrink-0 border-b border-gray-200 px-5 py-4 sm:px-7">
         <button
           type="button"
           onClick={onBack}
@@ -328,7 +328,7 @@ function RequestReadingPane({
           <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted">
             Message
           </p>
-          <p className="whitespace-pre-wrap rounded-2xl border border-navy/10 bg-offwhite/60 p-4 text-sm text-ink">
+          <p className="whitespace-pre-wrap rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-ink">
             {request.message}
           </p>
         </div>
@@ -337,7 +337,7 @@ function RequestReadingPane({
         <div className="mt-5 flex flex-wrap gap-2">
           <a
             href={`tel:${request.phone}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-navy/15 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
           >
             <Icon name="Phone" className="h-3.5 w-3.5" />
             Call
@@ -345,7 +345,7 @@ function RequestReadingPane({
           {request.email && (
             <a
               href={`mailto:${request.email}`}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-navy/15 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
             >
               <Icon name="Mail" className="h-3.5 w-3.5" />
               Email
@@ -355,7 +355,7 @@ function RequestReadingPane({
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-navy/15 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-navy transition-colors hover:border-sky hover:text-sky"
           >
             <Icon name="MessageCircle" className="h-3.5 w-3.5" />
             WhatsApp
@@ -363,7 +363,7 @@ function RequestReadingPane({
         </div>
 
         {/* Reply — email if we have one, WhatsApp otherwise. */}
-        <div className="mt-6 border-t border-navy/10 pt-5">
+        <div className="mt-6 border-t border-gray-200 pt-5">
           {request.email ? (
             <>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted">
@@ -374,7 +374,7 @@ function RequestReadingPane({
                 value={replyText}
                 onChange={(event) => setReplyText(event.target.value)}
                 placeholder="Type your reply — this will be emailed to the customer."
-                className="w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm text-ink transition-colors focus:border-sky focus:outline-none"
+                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-ink transition-colors hover:border-gray-300 focus:border-sky focus:outline-none focus:ring-1 focus:ring-sky"
               />
               {replyError && (
                 <p className="mt-2 text-sm text-red-700">{replyError}</p>

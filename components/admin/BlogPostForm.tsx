@@ -13,7 +13,7 @@ import type { BlogPost } from "@/lib/supabase";
 import { useToast } from "@/lib/useToast";
 
 const fieldClasses =
-  "w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 transition-colors focus:border-sky focus:outline-none";
+  "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 transition-colors hover:border-gray-300 focus:border-sky focus:outline-none focus:ring-1 focus:ring-sky";
 const labelClasses = "mb-1.5 block text-sm font-medium text-navy";
 
 function StatusPill({ published }: { published: boolean }) {
@@ -244,7 +244,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
   return (
     <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
       {/* Editor header — pinned to the top of the panel, never scrolls. */}
-      <div className="shrink-0 border-b border-navy/10 bg-white px-5 py-4 sm:px-8">
+      <div className="shrink-0 border-b border-gray-200 bg-white px-5 py-4 sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <button
@@ -261,7 +261,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2.5 rounded-xl border border-navy/15 bg-offwhite/60 px-3 py-2">
+            <label className="flex items-center gap-2.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Published
               </span>
@@ -308,7 +308,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
 
           <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:items-stretch">
             {/* Main column */}
-            <div className="flex min-h-0 flex-col space-y-6 rounded-2xl border border-navy/10 bg-white p-6 shadow-soft sm:p-8">
+            <div className="flex min-h-0 flex-col space-y-6 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
             <div>
               <label htmlFor="title" className={labelClasses}>
                 Title
@@ -385,14 +385,14 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
                 <label htmlFor="body" className="text-sm font-medium text-navy">
                   Body <span className="font-normal text-muted">(Markdown)</span>
                 </label>
-                <div className="inline-flex rounded-lg border border-navy/15 bg-offwhite/60 p-0.5 text-xs font-semibold">
+                <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5 text-xs font-semibold">
                   <button
                     type="button"
                     onClick={() => setBodyTab("write")}
-                    className={`rounded-md px-3 py-1.5 transition-colors ${
+                    className={`rounded-md border px-3 py-1.5 transition-colors ${
                       bodyTab === "write"
-                        ? "bg-white text-navy shadow-soft"
-                        : "text-muted hover:text-navy"
+                        ? "border-gray-200 bg-white text-navy"
+                        : "border-transparent text-muted hover:text-navy"
                     }`}
                   >
                     Write
@@ -400,10 +400,10 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
                   <button
                     type="button"
                     onClick={() => setBodyTab("preview")}
-                    className={`rounded-md px-3 py-1.5 transition-colors ${
+                    className={`rounded-md border px-3 py-1.5 transition-colors ${
                       bodyTab === "preview"
-                        ? "bg-white text-navy shadow-soft"
-                        : "text-muted hover:text-navy"
+                        ? "border-gray-200 bg-white text-navy"
+                        : "border-transparent text-muted hover:text-navy"
                     }`}
                   >
                     Preview
@@ -413,7 +413,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
 
               {bodyTab === "write" ? (
                 <div className="flex min-h-0 flex-1 flex-col">
-                  <div className="mb-2 flex shrink-0 flex-wrap items-center gap-0.5 rounded-xl border border-navy/15 bg-offwhite/60 p-1.5">
+                  <div className="mb-2 flex shrink-0 flex-wrap items-center gap-0.5 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
                     <ToolbarButton
                       icon="Bold"
                       label="Bold"
@@ -466,7 +466,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
                   />
                 </div>
               ) : (
-                <div className="min-h-[320px] flex-1 overflow-y-auto rounded-2xl border border-navy/15 bg-white px-5 py-4">
+                <div className="min-h-[320px] flex-1 overflow-y-auto rounded-2xl border border-gray-200 bg-white px-5 py-4">
                   {bodyMarkdown.trim() ? (
                     <MarkdownContent markdown={bodyMarkdown} />
                   ) : (
@@ -480,7 +480,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
           </div>
 
           {/* Side column — post settings */}
-          <div className="space-y-6 rounded-2xl border border-navy/10 bg-white p-5 shadow-soft sm:p-6">
+          <div className="space-y-6 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
             <div>
               <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted">
                 Post settings
@@ -504,7 +504,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
                 Bilic photo when available.
               </p>
 
-              <div className="relative mt-3 aspect-video w-full overflow-hidden rounded-xl border border-navy/10 bg-offwhite">
+              <div className="relative mt-3 aspect-video w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
                 {coverImage.trim() && !coverImageBroken ? (
                   <Image
                     src={coverImage.trim()}
@@ -525,7 +525,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
               </div>
             </div>
 
-            <div className="space-y-2 border-t border-navy/10 pt-4 text-sm">
+            <div className="space-y-2 border-t border-gray-200 pt-4 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted">Status</span>
                 <StatusPill published={published} />

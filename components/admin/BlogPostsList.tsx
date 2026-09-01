@@ -67,7 +67,7 @@ export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-navy/10 bg-white p-14 text-center shadow-soft">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-14 text-center">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky/10 text-sky">
           <Icon name="FileText" className="h-7 w-7" />
         </span>
@@ -94,12 +94,12 @@ export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search posts by title…"
-          className="w-full rounded-xl border border-navy/15 bg-white py-2 pl-9 pr-3 text-sm text-ink transition-colors focus:border-sky focus:outline-none"
+          className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-ink transition-colors hover:border-gray-300 focus:border-sky focus:outline-none focus:ring-1 focus:ring-sky"
         />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-navy/10 bg-white p-10 text-center text-sm text-muted shadow-soft">
+        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-muted">
           No posts match &ldquo;{query}&rdquo;.
         </div>
       ) : (
@@ -107,9 +107,9 @@ export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
           {filtered.map((post) => (
             <li
               key={post.id}
-              className="flex items-center gap-4 rounded-2xl border border-navy/10 bg-white p-3 shadow-soft transition-shadow hover:shadow-lift sm:p-4"
+              className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-3 transition-colors hover:border-gray-300 sm:p-4"
             >
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-offwhite sm:h-20 sm:w-20">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 sm:h-20 sm:w-20">
                 {post.cover_image ? (
                   <Image
                     src={post.cover_image}

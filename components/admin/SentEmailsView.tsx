@@ -63,9 +63,9 @@ export default function SentEmailsView({
       <div
         className={`${
           active ? "hidden" : "flex"
-        } h-full min-h-0 w-full flex-col border-r border-navy/10 bg-white md:flex md:w-[360px] md:shrink-0`}
+        } h-full min-h-0 w-full flex-col border-r border-gray-200 bg-white md:flex md:w-[360px] md:shrink-0`}
       >
-        <div className="shrink-0 border-b border-navy/10 px-5 py-4">
+        <div className="shrink-0 border-b border-gray-200 px-5 py-4">
           <h1 className="text-lg font-semibold text-navy">Sent</h1>
           <p className="mt-0.5 text-xs text-muted">
             {initialEmails.length} email{initialEmails.length === 1 ? "" : "s"} sent
@@ -79,7 +79,7 @@ export default function SentEmailsView({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search recipient, subject…"
-              className="w-full rounded-xl border border-navy/15 bg-offwhite/60 py-2 pl-9 pr-3 text-sm text-ink transition-colors focus:border-sky focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-ink transition-colors hover:border-gray-300 focus:border-sky focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky"
             />
           </div>
         </div>
@@ -96,13 +96,13 @@ export default function SentEmailsView({
               }
             />
           ) : (
-            <ul className="divide-y divide-navy/5">
+            <ul className="divide-y divide-gray-200">
               {filtered.map((email) => (
                 <li key={email.id}>
                   <button
                     type="button"
                     onClick={() => setActiveId(email.id)}
-                    className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-offwhite ${
+                    className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-gray-50 ${
                       activeId === email.id ? "bg-sky/5" : ""
                     }`}
                   >
@@ -165,7 +165,7 @@ function SentEmailReadingPane({
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
-      <div className="shrink-0 border-b border-navy/10 px-5 py-4 sm:px-7">
+      <div className="shrink-0 border-b border-gray-200 px-5 py-4 sm:px-7">
         <button
           type="button"
           onClick={onBack}
@@ -207,7 +207,7 @@ function SentEmailReadingPane({
           <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted">
             Message
           </p>
-          <p className="whitespace-pre-wrap rounded-2xl border border-navy/10 bg-offwhite/60 p-4 text-sm text-ink">
+          <p className="whitespace-pre-wrap rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-ink">
             {email.body}
           </p>
         </div>

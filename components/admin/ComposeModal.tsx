@@ -7,7 +7,7 @@ import Icon from "@/components/ui/Icon";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const fieldClasses =
-  "w-full rounded-2xl border border-navy/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 transition-colors focus:border-sky focus:outline-none";
+  "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-ink placeholder:text-muted/70 transition-colors hover:border-gray-300 focus:border-sky focus:outline-none focus:ring-1 focus:ring-sky";
 const labelClasses = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted";
 
 export default function ComposeModal({
@@ -79,7 +79,7 @@ export default function ComposeModal({
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex h-[92vh] w-full flex-col overflow-y-auto bg-white p-6 shadow-lift sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl sm:p-7"
+        className="flex h-[92vh] w-full flex-col overflow-y-auto border-gray-200 bg-white p-6 sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl sm:border sm:p-7"
       >
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-navy">New Message</h2>
@@ -87,7 +87,7 @@ export default function ComposeModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 rounded-xl p-2 text-muted transition-colors hover:bg-offwhite hover:text-navy"
+            className="shrink-0 rounded-xl p-2 text-muted transition-colors hover:bg-gray-50 hover:text-navy"
           >
             <Icon name="X" className="h-5 w-5" />
           </button>
@@ -153,7 +153,7 @@ export default function ComposeModal({
           </div>
         )}
 
-        <div className="mt-5 flex justify-end gap-2 border-t border-navy/10 pt-5">
+        <div className="mt-5 flex justify-end gap-2 border-t border-gray-200 pt-5">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>

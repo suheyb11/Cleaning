@@ -51,7 +51,7 @@ export default function AdminShell({
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-offwhite lg:flex-row">
+    <div className="flex h-screen flex-col overflow-hidden bg-white lg:flex-row">
       {/* Mobile top bar */}
       <header className="flex shrink-0 items-center justify-between border-b border-navy/10 bg-navy px-4 py-3 lg:hidden">
         <button
