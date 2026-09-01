@@ -242,9 +242,9 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* Sticky editor header — actions stay reachable while scrolling. */}
-      <div className="sticky top-0 z-10 border-b border-navy/10 bg-white/95 px-5 py-4 backdrop-blur sm:px-8">
+    <form onSubmit={handleSubmit} className="flex h-full flex-col overflow-hidden">
+      {/* Editor header — pinned to the top of the panel, never scrolls. */}
+      <div className="shrink-0 border-b border-navy/10 bg-white px-5 py-4 sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <button
@@ -294,17 +294,21 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
         </div>
       </div>
 
-      <div className="container-x py-8 sm:py-10">
-        {error && (
-          <div className="mb-6 flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <Icon name="AlertCircle" className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>{error}</p>
-          </div>
-        )}
+      {/* Everything below the header lives in its own scroll region, so the
+          header never moves and the body editor can flex to fill the rest
+          of the panel instead of leaving empty space under a short page. */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto flex h-full max-w-[1400px] flex-col px-5 py-6 sm:px-8 sm:py-8">
+          {error && (
+            <div className="mb-6 flex shrink-0 items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <Icon name="AlertCircle" className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>{error}</p>
+            </div>
+          )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
-          {/* Main column */}
-          <div className="space-y-6 rounded-2xl border border-navy/10 bg-white p-6 shadow-soft sm:p-8">
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr] lg:items-stretch">
+            {/* Main column */}
+            <div className="flex min-h-0 flex-col space-y-6 rounded-2xl border border-navy/10 bg-white p-6 shadow-soft sm:p-8">
             <div>
               <label htmlFor="title" className={labelClasses}>
                 Title
@@ -376,8 +380,8 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
               />
             </div>
 
-            <div>
-              <div className="mb-1.5 flex items-center justify-between gap-3">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="mb-1.5 flex shrink-0 items-center justify-between gap-3">
                 <label htmlFor="body" className="text-sm font-medium text-navy">
                   Body <span className="font-normal text-muted">(Markdown)</span>
                 </label>
@@ -408,8 +412,8 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
               </div>
 
               {bodyTab === "write" ? (
-                <>
-                  <div className="mb-2 flex flex-wrap items-center gap-0.5 rounded-xl border border-navy/15 bg-offwhite/60 p-1.5">
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <div className="mb-2 flex shrink-0 flex-wrap items-center gap-0.5 rounded-xl border border-navy/15 bg-offwhite/60 p-1.5">
                     <ToolbarButton
                       icon="Bold"
                       label="Bold"
@@ -453,17 +457,16 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
                   <textarea
                     id="body"
                     ref={bodyRef}
-                    rows={18}
                     value={bodyMarkdown}
                     onChange={(event) => setBodyMarkdown(event.target.value)}
                     placeholder={
                       "## A heading\n\nWrite the post in Markdown — **bold**, *italic*, lists, links…"
                     }
-                    className={`${fieldClasses} resize-y font-mono text-[13px] leading-relaxed`}
+                    className={`${fieldClasses} min-h-[320px] flex-1 resize-none font-mono text-[13px] leading-relaxed`}
                   />
-                </>
+                </div>
               ) : (
-                <div className="max-h-[520px] min-h-[200px] overflow-y-auto rounded-2xl border border-navy/15 bg-white px-5 py-4">
+                <div className="min-h-[320px] flex-1 overflow-y-auto rounded-2xl border border-navy/15 bg-white px-5 py-4">
                   {bodyMarkdown.trim() ? (
                     <MarkdownContent markdown={bodyMarkdown} />
                   ) : (
@@ -547,6 +550,7 @@ export default function BlogPostForm({ post }: { post?: BlogPost }) {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <Toast toast={toast} />

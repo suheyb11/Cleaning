@@ -20,7 +20,7 @@ export default async function EditBlogPostPage({
   if (error || !data) notFound();
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full">
       <BlogPostForm post={data as BlogPost} />
     </div>
   );
