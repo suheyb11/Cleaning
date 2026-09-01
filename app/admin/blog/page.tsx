@@ -25,7 +25,7 @@ export default async function AdminBlogPage() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="container-x py-8 sm:py-10">
+      <div className="mx-auto max-w-[1400px] px-5 py-8 sm:px-8 sm:py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="mb-1 text-2xl font-semibold text-navy">

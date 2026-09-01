@@ -85,7 +85,7 @@ export default function BlogPostsList({ posts }: { posts: BlogPost[] }) {
 
   return (
     <div>
-      <div className="relative mb-4 max-w-xs">
+      <div className="relative mb-4 w-full max-w-[480px]">
         <Icon
           name="Search"
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
