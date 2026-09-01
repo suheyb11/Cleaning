@@ -57,3 +57,13 @@ export type BlogPost = {
   created_at: string;
   updated_at: string;
 };
+
+export type SentEmail = {
+  id: string;
+  to_email: string;
+  to_name: string | null;
+  subject: string;
+  body: string;
+  request_id: string | null;
+  created_at: string;
+};

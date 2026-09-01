@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import Toast from "@/components/admin/Toast";
 import Button from "@/components/ui/Button";
@@ -9,35 +9,11 @@ import { customerWhatsAppLink, formatDate } from "@/lib/format";
 import type { QuoteRequest } from "@/lib/supabase";
 import { useToast } from "@/lib/useToast";
 
-function StatCard({
-  icon,
-  label,
-  value,
-  accent = false,
-}: {
-  icon: IconName;
-  label: string;
-  value: number;
-  accent?: boolean;
-}) {
+function Avatar({ name }: { name: string }) {
   return (
-    <div className="flex items-center gap-3.5 rounded-2xl border border-navy/10 bg-white p-5 shadow-soft">
-      <span
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-          accent ? "bg-sky/10 text-sky" : "bg-navy/5 text-navy"
-        }`}
-      >
-        <Icon name={icon} className="h-5 w-5" />
-      </span>
-      <div>
-        <p className="font-heading text-2xl font-semibold leading-none text-navy">
-          {value}
-        </p>
-        <p className="mt-1.5 text-xs font-medium uppercase tracking-wide text-muted">
-          {label}
-        </p>
-      </div>
-    </div>
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky/10 text-sm font-semibold text-sky">
+      {name.trim().charAt(0).toUpperCase() || "?"}
+    </span>
   );
 }
 
@@ -45,7 +21,7 @@ function StatusPill({ status }: { status: QuoteRequest["status"] }) {
   const isNew = status === "new";
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
+      className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
         isNew ? "bg-sky/10 text-sky" : "bg-emerald-50 text-emerald-700"
       }`}
     >
@@ -54,16 +30,25 @@ function StatusPill({ status }: { status: QuoteRequest["status"] }) {
   );
 }
 
-/** A field shown full-size on desktop, with its own label restored on mobile
- *  once the row collapses from a table into a stacked card. */
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function EmptyState({
+  icon,
+  title,
+  text,
+  className = "",
+}: {
+  icon: IconName;
+  title: string;
+  text: string;
+  className?: string;
+}) {
   return (
-    <span className="flex items-center justify-between gap-3 sm:block">
-      <span className="text-xs font-medium uppercase tracking-wide text-muted sm:hidden">
-        {label}
+    <div className={`flex flex-col items-center justify-center px-6 py-16 text-center ${className}`}>
+      <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky/10 text-sky">
+        <Icon name={icon} className="h-7 w-7" />
       </span>
-      <span className="truncate text-sm text-ink">{children}</span>
-    </span>
+      <p className="font-semibold text-navy">{title}</p>
+      <p className="mt-1 text-sm text-muted">{text}</p>
+    </div>
   );
 }
 
@@ -73,102 +58,150 @@ export default function QuoteRequestsView({
   initialRequests: QuoteRequest[];
 }) {
   const [requests, setRequests] = useState(initialRequests);
-  const [openRequest, setOpenRequest] = useState<QuoteRequest | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const { toast, showToast } = useToast();
 
-  const total = requests.length;
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return requests;
+    return requests.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        r.service.toLowerCase().includes(q) ||
+        (r.email ?? "").toLowerCase().includes(q),
+    );
+  }, [requests, query]);
+
+  const active = requests.find((r) => r.id === activeId) ?? null;
   const newCount = requests.filter((r) => r.status === "new").length;
-  const repliedCount = total - newCount;
 
   function handleStatusChange(id: string, status: QuoteRequest["status"]) {
     setRequests((previous) =>
       previous.map((r) => (r.id === id ? { ...r, status } : r)),
     );
-    setOpenRequest((previous) =>
-      previous && previous.id === id ? { ...previous, status } : previous,
-    );
   }
 
   return (
-    <div>
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard icon="Inbox" label="Total Requests" value={total} />
-        <StatCard
-          icon="Mail"
-          label="New — Awaiting Reply"
-          value={newCount}
-          accent
-        />
-        <StatCard icon="CheckCircle2" label="Replied" value={repliedCount} />
+    <div className="flex h-full min-h-0">
+      {/* List column */}
+      <div
+        className={`${
+          active ? "hidden" : "flex"
+        } h-full min-h-0 w-full flex-col border-r border-navy/10 bg-white md:flex md:w-[360px] md:shrink-0`}
+      >
+        <div className="shrink-0 border-b border-navy/10 px-5 py-4">
+          <h1 className="text-lg font-semibold text-navy">Inbox</h1>
+          <p className="mt-0.5 text-xs text-muted">
+            {requests.length} request{requests.length === 1 ? "" : "s"}
+            {newCount > 0 && ` · ${newCount} new`}
+          </p>
+          <div className="relative mt-3">
+            <Icon
+              name="Search"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search name, service, email…"
+              className="w-full rounded-xl border border-navy/15 bg-offwhite/60 py-2 pl-9 pr-3 text-sm text-ink transition-colors focus:border-sky focus:bg-white focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <EmptyState
+              icon="Inbox"
+              title={requests.length === 0 ? "No quote requests yet" : "No matches"}
+              text={
+                requests.length === 0
+                  ? "New submissions from the contact form will show up here."
+                  : "Try a different search."
+              }
+            />
+          ) : (
+            <ul className="divide-y divide-navy/5">
+              {filtered.map((request) => (
+                <li key={request.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveId(request.id)}
+                    className={`flex w-full items-start gap-3 px-5 py-3.5 text-left transition-colors hover:bg-offwhite ${
+                      activeId === request.id ? "bg-sky/5" : ""
+                    }`}
+                  >
+                    <Avatar name={request.name} />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm font-semibold text-navy">
+                          {request.name}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted">
+                          {formatDate(request.created_at)}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1.5">
+                        {request.status === "new" && (
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky"
+                            aria-hidden="true"
+                          />
+                        )}
+                        <span className="truncate text-sm font-medium text-ink">
+                          {request.service}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-muted">
+                        {request.message}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
-      {total === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-navy/10 bg-white p-12 text-center shadow-soft">
-          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky/10 text-sky">
-            <Icon name="Inbox" className="h-7 w-7" />
-          </span>
-          <p className="font-semibold text-navy">No quote requests yet</p>
-          <p className="mt-1 text-sm text-muted">
-            New submissions from the contact form will show up here.
-          </p>
-        </div>
-      ) : (
-        <ul className="divide-y divide-navy/5 overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-soft">
-          <li
-            aria-hidden="true"
-            className="hidden bg-offwhite/60 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted sm:grid sm:grid-cols-[1.3fr_1fr_1fr_1.3fr_1fr_0.8fr]"
-          >
-            <span>Name</span>
-            <span>Service</span>
-            <span>Phone</span>
-            <span>Email</span>
-            <span>Date</span>
-            <span>Status</span>
-          </li>
-
-          {requests.map((request) => (
-            <li key={request.id}>
-              <button
-                type="button"
-                onClick={() => setOpenRequest(request)}
-                className="flex w-full flex-col gap-2 px-5 py-4 text-left transition-colors hover:bg-offwhite focus-visible:bg-offwhite sm:grid sm:grid-cols-[1.3fr_1fr_1fr_1.3fr_1fr_0.8fr] sm:items-center sm:gap-4"
-              >
-                <span className="font-semibold text-navy">{request.name}</span>
-                <Field label="Service">{request.service}</Field>
-                <Field label="Phone">{request.phone}</Field>
-                <Field label="Email">{request.email || "—"}</Field>
-                <Field label="Date">{formatDate(request.created_at)}</Field>
-                <span>
-                  <StatusPill status={request.status} />
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {openRequest && (
-        <RequestModal
-          request={openRequest}
-          onClose={() => setOpenRequest(null)}
-          onStatusChange={(status) => handleStatusChange(openRequest.id, status)}
-          onToast={showToast}
-        />
-      )}
+      {/* Reading pane */}
+      <div
+        className={`${
+          active ? "flex" : "hidden"
+        } h-full min-h-0 w-full flex-col md:flex`}
+      >
+        {active ? (
+          <RequestReadingPane
+            key={active.id}
+            request={active}
+            onBack={() => setActiveId(null)}
+            onStatusChange={(status) => handleStatusChange(active.id, status)}
+            onToast={showToast}
+          />
+        ) : (
+          <EmptyState
+            icon="Mail"
+            title="Select a request"
+            text="Choose a quote request from the list to read it."
+            className="h-full"
+          />
+        )}
+      </div>
 
       <Toast toast={toast} />
     </div>
   );
 }
 
-function RequestModal({
+function RequestReadingPane({
   request,
-  onClose,
+  onBack,
   onStatusChange,
   onToast,
 }: {
   request: QuoteRequest;
-  onClose: () => void;
+  onBack: () => void;
   onStatusChange: (status: QuoteRequest["status"]) => void;
   onToast: (type: "success" | "error", text: string) => void;
 }) {
@@ -176,19 +209,6 @@ function RequestModal({
   const [sending, setSending] = useState(false);
   const [marking, setMarking] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
-
-  // Escape closes the modal, and the background shouldn't scroll behind it.
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [onClose]);
 
   async function handleSendReply() {
     if (!replyText.trim()) {
@@ -256,37 +276,40 @@ function RequestModal({
   );
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Quote request from ${request.name}`}
-      onClick={onClose}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-navy/40 p-4"
-    >
-      <div
-        onClick={(event) => event.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-lift sm:p-7"
-      >
+    <div className="flex h-full min-h-0 flex-col bg-white">
+      <div className="shrink-0 border-b border-navy/10 px-5 py-4 sm:px-7">
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-navy md:hidden"
+        >
+          <Icon name="ChevronLeft" className="h-4 w-4" />
+          Back to Inbox
+        </button>
+
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-navy">{request.name}</h2>
-            <p className="text-sm text-muted">{formatDate(request.created_at)}</p>
+          <div className="flex items-start gap-3">
+            <Avatar name={request.name} />
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-navy">
+                {request.name}
+              </h2>
+              <p className="truncate text-sm text-muted">
+                {request.email || request.phone}
+              </p>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="shrink-0 rounded-xl p-2 text-muted transition-colors hover:bg-offwhite hover:text-navy"
-          >
-            <Icon name="X" className="h-5 w-5" />
-          </button>
+          <div className="flex shrink-0 flex-col items-end gap-1.5">
+            <StatusPill status={request.status} />
+            <span className="text-xs text-muted">
+              {formatDate(request.created_at)}
+            </span>
+          </div>
         </div>
+      </div>
 
-        <div className="mt-3">
-          <StatusPill status={request.status} />
-        </div>
-
-        <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-7">
+        <dl className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-muted">
               Service
@@ -298,12 +321,6 @@ function RequestModal({
               Phone
             </dt>
             <dd className="mt-0.5 text-ink">{request.phone}</dd>
-          </div>
-          <div className="col-span-2">
-            <dt className="text-xs font-medium uppercase tracking-wide text-muted">
-              Email
-            </dt>
-            <dd className="mt-0.5 text-ink">{request.email || "Not provided"}</dd>
           </div>
         </dl>
 

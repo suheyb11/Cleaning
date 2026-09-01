@@ -22,24 +22,26 @@ export default async function AdminBlogPage() {
   const posts = await getAllPosts();
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="mb-1 text-2xl font-semibold text-navy">
-            Blog Posts
-          </h1>
-          <p className="text-sm text-muted">
-            {posts.length} post{posts.length === 1 ? "" : "s"} total.
-          </p>
+    <div className="h-full overflow-y-auto">
+      <div className="container-x py-8 sm:py-10">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="mb-1 text-2xl font-semibold text-navy">
+              Blog Posts
+            </h1>
+            <p className="text-sm text-muted">
+              {posts.length} post{posts.length === 1 ? "" : "s"} total.
+            </p>
+          </div>
+
+          <Button href="/admin/blog/new">
+            <Icon name="FileText" className="h-4 w-4" />
+            New Post
+          </Button>
         </div>
 
-        <Button href="/admin/blog/new">
-          <Icon name="FileText" className="h-4 w-4" />
-          New Post
-        </Button>
+        <BlogPostsList posts={posts} />
       </div>
-
-      <BlogPostsList posts={posts} />
     </div>
   );
 }

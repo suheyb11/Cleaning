@@ -250,9 +250,9 @@ app/
   contact/page.tsx  Contact page
   blog/page.tsx     Blog listing — published posts, newest first
   blog/[slug]/      Single blog post (Markdown body)
-  admin/            Password-protected admin portal — see §10
+  admin/            Password-protected admin portal (email-client UI) — see §10
   api/quote/        Saves + emails a quote request (see §4 and §10)
-  api/admin/        Admin login/logout + quote reply + blog CRUD (see §10)
+  api/admin/        Admin login/logout + quote reply + compose + blog CRUD (see §10)
   not-found.tsx     404 page
   globals.css       Tailwind + base styles + reduced-motion rules
 
@@ -262,7 +262,8 @@ lib/
   supabase.ts       The one Supabase client (server-only, secret key)
   admin-auth.ts     The admin password/cookie check, shared by the login
                      route and middleware.ts
-  email.ts          Shared escapeHtml() + brandedEmailHtml() for every outgoing email
+  email.ts          Shared escapeHtml() + brandedEmailHtml() + sendAdminEmail()
+                    (send via Resend + record in sent_emails) for every outgoing email
   format.ts         formatDate(), slugify(), customerWhatsAppLink()
   useToast.ts        Tiny local-toast hook used by the admin portal
 
@@ -289,8 +290,11 @@ components/
   ScrollProgress.tsx  Thin accent bar showing scroll position
   MarkdownContent.tsx Renders a blog post's Markdown with brand typography
   admin/
-    AdminHeader.tsx          Navy top bar: tab nav (Quote Requests / Blog Posts) + log out
-    QuoteRequestsView.tsx    Stat cards + responsive list + the detail/reply modal
+    AdminShell.tsx           Navy sidebar shell (Inbox/Sent/Blog nav, Compose, log out);
+                             collapses to a top bar + hamburger on mobile
+    QuoteRequestsView.tsx    Inbox: searchable list + reading pane with reply
+    SentEmailsView.tsx       Sent: searchable list + read-only reading pane
+    ComposeModal.tsx         Compose-email modal, opened from AdminShell
     BlogPostsList.tsx        Responsive list with status pills + Edit/Delete
     BlogPostForm.tsx         The New Post / Edit Post form (shared), with cover preview
     Toast.tsx                The small bottom-corner success/error notification
@@ -460,6 +464,18 @@ create table blog_posts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Every email the admin sends — quote-request replies and emails composed
+-- from scratch — so they show up in the /admin Sent folder.
+create table sent_emails (
+  id uuid primary key default gen_random_uuid(),
+  to_email text not null,
+  to_name text,
+  subject text not null,
+  body text not null,
+  request_id uuid references quote_requests(id),  -- set for a reply; null for a composed email
+  created_at timestamptz not null default now()
+);
 ```
 
 3. Get your project's API values:
@@ -506,9 +522,10 @@ bug here. In practice that means:
 
 - The owner-notification email (to `QUOTE_TO_EMAIL`) works immediately if
   `QUOTE_TO_EMAIL` *is* the Resend account owner's address.
-- The **customer auto-reply** (sent right after they submit the form) and
-  the **admin's reply-to-customer email** (sent from `/admin`) will not
-  reach any other real customer inbox until you verify your own domain:
+- The **customer auto-reply** (sent right after they submit the form), the
+  **admin's reply-to-customer email**, and any **composed email** (both sent
+  from `/admin` — see §10.5) will not reach any other real customer inbox
+  until you verify your own domain:
   1. Resend → **Domains** → **Add Domain** → enter your domain.
   2. Resend shows a set of DNS records (SPF/DKIM, etc.) — add exactly those
      in **Cloudflare → DNS** for that domain (Cloudflare is where this
@@ -516,10 +533,12 @@ bug here. In practice that means:
   3. Wait for Resend to show the domain as **Verified**, then set
      `QUOTE_FROM_EMAIL` to an address on it, e.g. `quotes@bilic.com`.
 - Until then: the customer auto-reply fails **silently** (logged only —
-  never shown to the visitor, so a lead is never lost over it), but the
-  **admin reply is different** — if it fails to send, the admin sees a
-  clear error in `/admin` and the typed message is kept so they can retry.
-  Either way, nothing crashes: every Resend call is wrapped in try/catch.
+  never shown to the visitor, so a lead is never lost over it), but **admin
+  replies and composed emails are different** — if either fails to send,
+  the admin sees a clear error in `/admin` (and, for a reply, the typed
+  message is kept so they can retry). Either way, nothing crashes: every
+  Resend call is wrapped in try/catch and the real error is logged to the
+  console (visible in Cloudflare → Workers & Pages → the project → Logs).
 
 ### 10.4 The blog
 
@@ -534,21 +553,45 @@ bug here. In practice that means:
 
 ### 10.5 The admin portal
 
-Go to `/admin`, log in with `ADMIN_PASSWORD`.
+Go to `/admin`, log in with `ADMIN_PASSWORD`. The portal is a slim,
+Gmail/Outlook-style email client: a navy sidebar (Inbox, Sent, Compose,
+Blog, Log out — collapses to a top bar + hamburger on mobile) around a
+message list + reading pane. On mobile there's a single pane; tapping a row
+opens the full message with a back arrow.
 
-- **Quote Requests** — stat cards for Total / New / Replied, then every
-  submission newest-first as a responsive list (stacks into cards on a
-  phone). Click one to open the full request in a modal: the message,
-  quick call/email/WhatsApp links, and either a reply box (emails the
-  customer via Resend and marks the row **Replied** — see the domain
-  caveat above for reaching real customers) or, if they left no email, a
-  **Reply on WhatsApp** button built from their phone number. **Mark as
-  Replied** is always available too, for requests handled by phone.
-- **Blog Posts** — every post, published or draft, as the same kind of
+- **Inbox** (`/admin`) — every `quote_requests` row as an email: avatar,
+  sender name, the service as the subject line, a one-line preview, the
+  date, and a light-blue dot/"New" pill for unreplied ones. A search box
+  filters by name / service / email. Selecting one opens it in the reading
+  pane: full message, quick call/email/WhatsApp links, and either a reply
+  box (emails the customer via Resend, records it in `sent_emails`, and
+  marks the row **Replied** — see the domain caveat above for reaching
+  real customers) or, if they left no email, a **Reply on WhatsApp**
+  button built from their phone number. **Mark as Replied** is always
+  available too, for requests handled by phone.
+- **Sent** (`/admin/sent`) — every row from `sent_emails` (replies and
+  composed emails alike), same email-row style, newest first, with the
+  same search box. Selecting one opens it read-only in the reading pane.
+- **Compose** (sidebar button, opens a modal from anywhere in the portal)
+  — To email, optional To name, Subject and Body. Sending POSTs to
+  `/api/admin/emails`, which checks the admin cookie (via `middleware.ts`,
+  same as every other `/api/admin/*` route), sends through Resend in the
+  shared branded template, and on success stores the email in
+  `sent_emails`. Client-side validation covers a valid email address plus
+  required subject/body; a failed send shows a clear inline error (and the
+  real error is logged server-side) without losing what was typed.
+- **Blog Posts** (`/admin/blog`) — every post, published or draft, as a
   responsive list. **New Post** opens a plain form: title, an
   auto-generated (editable) slug, excerpt, a cover image URL (with a small
   live preview), the body as Markdown in a plain textarea, and a Published
   toggle. Edit and Delete work the same way from the list.
+
+**What the Inbox is not:** it lists `quote_requests` — form submissions
+saved when someone submits the "Request a Free Quote" form — not a true
+inbox of arbitrary email sent to the business. Receiving real inbound
+email (e.g. to `info@bilic.com`) would need a separate future feature —
+Cloudflare Email Routing → an Email Worker → saving into a new table — and
+is **not built here**.
 
 **How the login works:** one password (`ADMIN_PASSWORD`), no user accounts.
 Logging in sets an `httpOnly` cookie holding a hash of the password (never

@@ -16,19 +16,8 @@ async function getQuoteRequests() {
   return (data ?? []) as QuoteRequest[];
 }
 
-export default async function AdminQuotesPage() {
+export default async function AdminInboxPage() {
   const requests = await getQuoteRequests();
 
-  return (
-    <div>
-      <h1 className="mb-1 text-2xl font-semibold text-navy">
-        Quote Requests
-      </h1>
-      <p className="mb-6 text-sm text-muted">
-        Click a request to read the full message and reply.
-      </p>
-
-      <QuoteRequestsView initialRequests={requests} />
-    </div>
-  );
+  return <QuoteRequestsView initialRequests={requests} />;
 }
