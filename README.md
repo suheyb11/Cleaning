@@ -395,8 +395,24 @@ Build**, set:
 | Build command    | `npm run build`                                                    |
 | Deploy command   | `npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy` (or `npm run deploy`) |
 
-Add the same env vars from §10 under **Settings → Variables and Secrets** (mark
-`SUPABASE_SECRET_KEY`, `RESEND_API_KEY` and `ADMIN_PASSWORD` as encrypted/secret).
+**Env vars on Cloudflare — split by whether they're secret:**
+
+- **Non-secret vars** live in the `vars` block of `wrangler.jsonc`
+  (`NEXT_PUBLIC_SUPABASE_URL`, `QUOTE_TO_EMAIL`, `QUOTE_FROM_EMAIL`). They are
+  committed to the repo and applied on every deploy. **Do not** rely on adding
+  these as plain "Text" variables in the dashboard — a Git-connected Workers
+  deploy resets Text variables to whatever `wrangler.jsonc` declares, so
+  dashboard-only Text vars vanish after each deploy. Edit them in
+  `wrangler.jsonc` and redeploy.
+- **Secrets** (`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `ADMIN_PASSWORD`) are
+  **never** committed. Set them in the Cloudflare dashboard under
+  **Settings → Variables and Secrets** as encrypted **Secrets**, or from the
+  CLI with `npx wrangler secret put NAME`. Deploys do not touch Secrets, so
+  they persist on their own.
+
+With `@opennextjs/cloudflare` and the `nodejs_compat` flag, both the
+`wrangler.jsonc` `vars` and the dashboard Secrets are exposed to the app as
+`process.env.*` at runtime — no code change needed.
 
 To test the exact Cloudflare build locally before pushing:
 
@@ -468,9 +484,10 @@ create table blog_posts (
 Set all six locally in `.env.local` (copy `.env.example` to start) **and** in
 Vercel → Project → Settings → Environment Variables before deploying —
 they're two separate places and both need every value. If you're also
-running this on Cloudflare (Pages/Workers), add the same values there under
-**Settings → Variables and Secrets**, marking `SUPABASE_SECRET_KEY` as an
-encrypted **Secret** (not a plain variable).
+running this on Cloudflare (Workers), the non-secret vars are already in
+`wrangler.jsonc` (`vars` block) and the three secrets
+(`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `ADMIN_PASSWORD`) go in
+**Settings → Variables and Secrets** as encrypted **Secrets** — see §9.1.
 
 | Variable | Where to get it | Notes |
 | --- | --- | --- |

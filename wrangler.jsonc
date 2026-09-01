@@ -4,6 +4,18 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-08-28",
   "compatibility_flags": ["nodejs_compat"],
+  // Non-secret runtime variables. These are declared here (not just in the
+  // Cloudflare dashboard) because a Git-connected Workers deploy resets any
+  // plain "Text" variables to whatever this file declares — so dashboard-only
+  // Text vars disappear on every deploy. Secrets are NOT affected: keep
+  // SUPABASE_SECRET_KEY, RESEND_API_KEY and ADMIN_PASSWORD as encrypted
+  // Secrets in the dashboard (or `npx wrangler secret put NAME`) — never here.
+  "vars": {
+    // TODO: confirm Supabase URL
+    "NEXT_PUBLIC_SUPABASE_URL": "https://qmtlrumlcmgusemgyobs.supabase.co",
+    "QUOTE_TO_EMAIL": "suheyb0102@gmail.com",
+    "QUOTE_FROM_EMAIL": "quotes@bilic.com"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
