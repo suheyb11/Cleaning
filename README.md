@@ -48,10 +48,47 @@ Other commands:
 
 | Command         | What it does                                 |
 | --------------- | -------------------------------------------- |
-| `npm run dev`   | Start the development server (hot reload)    |
-| `npm run build` | Build the production site                    |
-| `npm start`     | Run the built production site                |
-| `npm run lint`  | Check the code with ESLint                   |
+| `npm run dev`       | Start the development server (hot reload)                 |
+| `npm run dev:clean` | Wipe `.next/` first, then start the dev server            |
+| `npm run build`     | Build the production site                                 |
+| `npm start`         | Run the built production site                             |
+| `npm run lint`      | Check the code with ESLint                                |
+| `npm run clean`     | Delete the `.next/` and `.open-next/` build folders       |
+
+Node version is pinned to **20** (`.nvmrc`) — run `nvm use` if you use nvm.
+
+### 1.1 Running in WSL (recommended on Windows)
+
+On Windows, Sophos antivirus scans `.next/` while webpack is writing to it,
+which intermittently corrupts the dev build (`Cannot find module './xxx.js'`,
+or the whole page rendering unstyled). Running dev inside **WSL (Ubuntu)** on
+the Linux filesystem avoids this entirely and is faster.
+
+```bash
+# in the Ubuntu (WSL) terminal — one time
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# reopen the terminal
+nvm install 20 && nvm use 20
+
+# clone into the LINUX home folder — never under /mnt/c/...
+mkdir -p ~/projects && cd ~/projects
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git cleaning
+cd cleaning
+npm install
+
+# .env.local is gitignored — recreate it here (copy .env.example, fill in the six vars)
+nano .env.local
+
+npm run dev   # open http://localhost:3000 in your Windows browser
+```
+
+**The one rule:** keep the project under `~/projects/...`, not `/mnt/c/...` —
+`/mnt/c` is both slow and still scanned by Sophos. Edit the Linux-side files
+with VS Code's "WSL" extension (`code .` from the project folder).
+
+Git, GitHub and the Cloudflare deploy work exactly the same from inside WSL.
+**This is a local dev change only — the live Cloudflare site, database and
+Cloudflare env vars are untouched.**
 
 ---
 
