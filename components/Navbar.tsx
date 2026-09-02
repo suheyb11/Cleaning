@@ -27,12 +27,12 @@ export default function Navbar() {
   }, [pathname]);
 
   /**
-   * A link is "current" when it points at the page we are on. Hash links
-   * (/#process) belong to the home page, so they only ever highlight the
-   * section they scroll to — not the whole page.
+   * A link is "current" when it points at the page we are on. Every nav link
+   * is now a full-page route (no hash anchors), so "/" matches exactly and any
+   * other link matches when the current path sits under it.
    */
   const isActive = (href: string) =>
-    href.includes("#") ? false : href === "/" ? pathname === "/" : pathname.startsWith(href);
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header
