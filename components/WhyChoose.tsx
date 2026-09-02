@@ -4,11 +4,13 @@ import Card from "./ui/Card";
 import Reveal from "./ui/Reveal";
 import SectionHeading from "./ui/SectionHeading";
 
-export default function WhyChoose() {
+/** `showHeading={false}` on the standalone /why-us page, where the page
+ *  banner already carries the same title. */
+export default function WhyChoose({ showHeading = true }: { showHeading?: boolean }) {
   return (
     <section id="why-us" className="section-y bg-white">
       <div className="container-x">
-        <SectionHeading text={sectionText.whyUs} />
+        {showHeading && <SectionHeading text={sectionText.whyUs} />}
 
         {/* Seven cards do not divide evenly into three columns, so a plain
             grid leaves the last one stranded on the left. A centred flex-wrap

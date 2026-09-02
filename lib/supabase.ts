@@ -67,3 +67,18 @@ export type SentEmail = {
   request_id: string | null;
   created_at: string;
 };
+
+export type SentEmailAttachment = {
+  id: string;
+  sent_email_id: string;
+  filename: string;
+  storage_path: string;
+  content_type: string | null;
+  size_bytes: number | null;
+  created_at: string;
+};
+
+/** A sent email with its stored attachments embedded (see /admin/sent). */
+export type SentEmailWithAttachments = SentEmail & {
+  attachments: SentEmailAttachment[];
+};

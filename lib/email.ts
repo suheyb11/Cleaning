@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 
+import { ATTACHMENTS_BUCKET, type OutgoingAttachment } from "@/lib/attachments";
 import { getSupabase } from "@/lib/supabase";
 
 /** Escapes user input so it can't break an HTML email's layout or inject markup. */
@@ -47,6 +48,7 @@ export async function sendAdminEmail({
   message,
   greeting,
   requestId = null,
+  attachments = [],
 }: {
   toEmail: string;
   toName?: string | null;
@@ -54,6 +56,8 @@ export async function sendAdminEmail({
   message: string;
   greeting?: string;
   requestId?: string | null;
+  /** Files to send with the email (base64), already size-checked by the caller. */
+  attachments?: OutgoingAttachment[];
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.QUOTE_FROM_EMAIL;
@@ -83,6 +87,7 @@ export async function sendAdminEmail({
       replyTo: process.env.QUOTE_TO_EMAIL || undefined,
       subject,
       html,
+      ...(attachments.length > 0 ? { attachments } : {}),
     });
 
     if (error) {
@@ -94,18 +99,77 @@ export async function sendAdminEmail({
     return { ok: false, error: "Could not send the email." };
   }
 
-  const { error: insertError } = await getSupabase().from("sent_emails").insert({
-    to_email: toEmail,
-    to_name: toName,
-    subject,
-    body: message,
-    request_id: requestId,
-  });
+  const { data: inserted, error: insertError } = await getSupabase()
+    .from("sent_emails")
+    .insert({
+      to_email: toEmail,
+      to_name: toName,
+      subject,
+      body: message,
+      request_id: requestId,
+    })
+    .select("id")
+    .single();
 
-  if (insertError) {
+  if (insertError || !inserted) {
     console.error("Failed to store sent email:", insertError);
     // The email already sent — don't report failure over a storage hiccup.
+    return { ok: true };
+  }
+
+  if (attachments.length > 0) {
+    await storeSentAttachments(inserted.id as string, attachments);
   }
 
   return { ok: true };
+}
+
+/**
+ * Uploads each file to the private `email-attachments` bucket and records it
+ * in `sent_email_attachments`, linked to the sent email. Every file is
+ * independent: a failed upload is logged and skipped, and it never affects
+ * the email (already sent) or the other files.
+ */
+async function storeSentAttachments(
+  sentEmailId: string,
+  attachments: OutgoingAttachment[],
+) {
+  const supabase = getSupabase();
+
+  for (const [index, file] of attachments.entries()) {
+    try {
+      const bytes = Buffer.from(file.content, "base64");
+      const contentType = file.contentType || "application/octet-stream";
+      const safeName = file.filename.replace(/[^a-zA-Z0-9._-]+/g, "_");
+      const storagePath = `sent/${sentEmailId}/${index}-${safeName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(ATTACHMENTS_BUCKET)
+        .upload(storagePath, new Blob([bytes], { type: contentType }), {
+          contentType,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error(`Attachment upload failed (${file.filename}):`, uploadError);
+        continue;
+      }
+
+      const { error: rowError } = await supabase
+        .from("sent_email_attachments")
+        .insert({
+          sent_email_id: sentEmailId,
+          filename: file.filename,
+          storage_path: storagePath,
+          content_type: file.contentType ?? null,
+          size_bytes: file.size ?? bytes.byteLength,
+        });
+
+      if (rowError) {
+        console.error(`Attachment record failed (${file.filename}):`, rowError);
+      }
+    } catch (err) {
+      console.error(`Attachment storage error (${file.filename}):`, err);
+    }
+  }
 }

@@ -18,7 +18,13 @@ import SectionHeading from "./ui/SectionHeading";
  * (Tailwind responsive classes just move the grid columns around), so the
  * step list is never duplicated in the DOM.
  */
-export default function ProcessTimeline() {
+/** `showHeading={false}` on the standalone /process page, where the page
+ *  banner already carries the same title. */
+export default function ProcessTimeline({
+  showHeading = true,
+}: {
+  showHeading?: boolean;
+}) {
   const timelineRef = useRef<HTMLOListElement>(null);
   const reduceMotion = useReducedMotion();
 
@@ -37,7 +43,7 @@ export default function ProcessTimeline() {
   return (
     <section id="process" className="section-y bg-offwhite">
       <div className="container-x">
-        <SectionHeading text={sectionText.process} />
+        {showHeading && <SectionHeading text={sectionText.process} />}
 
         <ol
           ref={timelineRef}

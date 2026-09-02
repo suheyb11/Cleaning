@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 
+import AttachmentField from "@/components/admin/AttachmentField";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
+import { useAttachments } from "@/lib/useAttachments";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const fieldClasses =
@@ -23,6 +25,7 @@ export default function ComposeModal({
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const attachments = useAttachments();
 
   async function handleSend() {
     if (!EMAIL_RE.test(toEmail.trim())) {
@@ -42,6 +45,7 @@ export default function ComposeModal({
     setError(null);
 
     try {
+      const files = await attachments.toPayload();
       const response = await fetch("/api/admin/emails", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,6 +54,7 @@ export default function ComposeModal({
           toName: toName.trim(),
           subject: subject.trim(),
           message: message.trim(),
+          attachments: files,
         }),
       });
       const data: { ok: boolean; error?: string } = await response.json();
@@ -144,6 +149,14 @@ export default function ComposeModal({
               className={`${fieldClasses} resize-y`}
             />
           </div>
+
+          <AttachmentField
+            files={attachments.files}
+            error={attachments.error}
+            onAdd={attachments.addFiles}
+            onRemove={attachments.removeFile}
+            disabled={sending}
+          />
         </div>
 
         {error && (

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { validateAttachments } from "@/lib/attachments";
 import { sendAdminEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
@@ -12,13 +13,14 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * admin cookie).
  */
 export async function POST(request: Request) {
-  const { toEmail, toName, subject, message } = (await request
+  const { toEmail, toName, subject, message, attachments } = (await request
     .json()
     .catch(() => ({}))) as {
     toEmail?: string;
     toName?: string;
     subject?: string;
     message?: string;
+    attachments?: unknown;
   };
 
   if (!toEmail?.trim() || !EMAIL_RE.test(toEmail.trim())) {
@@ -40,6 +42,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const validatedAttachments = validateAttachments(attachments);
+  if (!validatedAttachments.ok) {
+    return NextResponse.json(
+      { ok: false, error: validatedAttachments.error },
+      { status: 400 },
+    );
+  }
+
   const trimmedToName = toName?.trim() || null;
 
   const result = await sendAdminEmail({
@@ -48,6 +58,7 @@ export async function POST(request: Request) {
     subject: subject.trim(),
     message: message.trim(),
     greeting: trimmedToName ? `Hi ${trimmedToName},` : undefined,
+    attachments: validatedAttachments.attachments,
   });
 
   if (!result.ok) {

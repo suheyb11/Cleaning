@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 
+import AttachmentField from "@/components/admin/AttachmentField";
 import Toast from "@/components/admin/Toast";
 import Button from "@/components/ui/Button";
 import Icon, { type IconName } from "@/components/ui/Icon";
 import { customerWhatsAppLink, formatDate } from "@/lib/format";
 import type { QuoteRequest } from "@/lib/supabase";
+import { useAttachments } from "@/lib/useAttachments";
 import { useToast } from "@/lib/useToast";
 
 function Avatar({ name }: { name: string }) {
@@ -209,6 +211,7 @@ function RequestReadingPane({
   const [sending, setSending] = useState(false);
   const [marking, setMarking] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
+  const attachments = useAttachments();
 
   async function handleSendReply() {
     if (!replyText.trim()) {
@@ -219,10 +222,11 @@ function RequestReadingPane({
     setReplyError(null);
 
     try {
+      const files = await attachments.toPayload();
       const response = await fetch(`/api/admin/quotes/${request.id}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: replyText }),
+        body: JSON.stringify({ message: replyText, attachments: files }),
       });
       const data: { ok: boolean; error?: string } = await response.json();
 
@@ -233,6 +237,7 @@ function RequestReadingPane({
       onStatusChange("replied");
       onToast("success", "Reply sent to the customer.");
       setReplyText("");
+      attachments.reset();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Could not send the reply.";
@@ -379,6 +384,17 @@ function RequestReadingPane({
               {replyError && (
                 <p className="mt-2 text-sm text-red-700">{replyError}</p>
               )}
+
+              <div className="mt-3">
+                <AttachmentField
+                  files={attachments.files}
+                  error={attachments.error}
+                  onAdd={attachments.addFiles}
+                  onRemove={attachments.removeFile}
+                  disabled={sending}
+                />
+              </div>
+
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button onClick={handleSendReply} loading={sending}>
                   <Icon name="Send" className="h-4 w-4" />

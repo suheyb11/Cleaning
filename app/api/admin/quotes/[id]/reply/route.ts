@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { validateAttachments } from "@/lib/attachments";
 import { sendAdminEmail } from "@/lib/email";
 import { getSupabase } from "@/lib/supabase";
 
@@ -16,13 +17,22 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const { message } = (await request.json().catch(() => ({}))) as {
+  const { message, attachments } = (await request.json().catch(() => ({}))) as {
     message?: string;
+    attachments?: unknown;
   };
 
   if (!message?.trim()) {
     return NextResponse.json(
       { ok: false, error: "Write a reply before sending." },
+      { status: 400 },
+    );
+  }
+
+  const validatedAttachments = validateAttachments(attachments);
+  if (!validatedAttachments.ok) {
+    return NextResponse.json(
+      { ok: false, error: validatedAttachments.error },
       { status: 400 },
     );
   }
@@ -55,6 +65,7 @@ export async function POST(
     message,
     greeting: `Hi ${quoteRequest.name},`,
     requestId: id,
+    attachments: validatedAttachments.attachments,
   });
 
   if (!result.ok) {

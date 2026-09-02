@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 
 import Icon, { type IconName } from "@/components/ui/Icon";
+import { formatBytes } from "@/lib/attachments";
 import { formatDate } from "@/lib/format";
-import type { SentEmail } from "@/lib/supabase";
+import type { SentEmailWithAttachments } from "@/lib/supabase";
 
 function Avatar({ name }: { name: string }) {
   return (
@@ -39,7 +40,7 @@ function EmptyState({
 export default function SentEmailsView({
   initialEmails,
 }: {
-  initialEmails: SentEmail[];
+  initialEmails: SentEmailWithAttachments[];
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -160,9 +161,13 @@ function SentEmailReadingPane({
   email,
   onBack,
 }: {
-  email: SentEmail;
+  email: SentEmailWithAttachments;
   onBack: () => void;
 }) {
+  const attachments = [...(email.attachments ?? [])].sort((a, b) =>
+    a.created_at.localeCompare(b.created_at),
+  );
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
       <div className="shrink-0 border-b border-gray-200 px-5 py-4 sm:px-7">
@@ -211,6 +216,43 @@ function SentEmailReadingPane({
             {email.body}
           </p>
         </div>
+
+        {attachments.length > 0 && (
+          <div className="mt-5">
+            <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted">
+              Attachment{attachments.length === 1 ? "" : "s"}
+            </p>
+            <ul className="space-y-1.5">
+              {attachments.map((file) => (
+                <li key={file.id}>
+                  <a
+                    href={`/api/admin/attachments/${file.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs transition-colors hover:border-sky"
+                  >
+                    <Icon
+                      name="FileText"
+                      className="h-3.5 w-3.5 shrink-0 text-sky"
+                    />
+                    <span className="min-w-0 flex-1 truncate text-ink">
+                      {file.filename}
+                    </span>
+                    {file.size_bytes != null && (
+                      <span className="shrink-0 text-muted">
+                        {formatBytes(file.size_bytes)}
+                      </span>
+                    )}
+                    <span className="inline-flex shrink-0 items-center gap-1 font-semibold text-sky">
+                      <Icon name="Download" className="h-3.5 w-3.5" />
+                      Download
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
