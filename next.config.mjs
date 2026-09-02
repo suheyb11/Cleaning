@@ -23,6 +23,16 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { dev }) => {
+    // Disable webpack's persistent disk cache in dev: on Windows it races
+    // with the OpenNext Cloudflare dev runtime's own file writes, corrupting
+    // .next/cache/webpack/*.pack.gz mid-session (ENOENT on rename) and
+    // leaving stale/missing chunk files (e.g. "Cannot find module './611.js'").
+    if (dev) {
+      config.cache = false;
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
