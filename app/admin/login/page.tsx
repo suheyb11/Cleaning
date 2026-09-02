@@ -4,6 +4,10 @@ import { useState, type FormEvent } from "react";
 
 import Icon from "@/components/ui/Icon";
 
+// Belt-and-braces: the admin layout is already force-dynamic, but mark the
+// login route itself too so it is never considered for prerendering.
+export const dynamic = "force-dynamic";
+
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import type { ReactNode } from "react";
 
 import AdminShell from "@/components/admin/AdminShell";
 import { getSupabase } from "@/lib/supabase";
+
+// Never prerender the admin portal — every page here reads per-request data
+// (session cookie, Supabase). Prerendering would run getSupabase() at build
+// time, where the env vars are absent, and throw.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -33,7 +39,11 @@ export default async function AdminLayout({
 }: {
   children: ReactNode;
 }) {
-  const newCount = await getNewRequestCount();
+  // The login page has no session and AdminShell renders it with no chrome,
+  // so it never needs (and must never trigger) the Supabase count fetch.
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  const newCount =
+    pathname === "/admin/login" ? 0 : await getNewRequestCount();
 
   return <AdminShell newCount={newCount}>{children}</AdminShell>;
 }

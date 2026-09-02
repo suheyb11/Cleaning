@@ -12,8 +12,15 @@ const PUBLIC_PATHS = ["/admin/login", "/api/admin/login", "/api/admin/logout"];
  * is a convenience layer, not the only line of defense).
  */
 export async function middleware(request: NextRequest) {
+  // Forward the current path so the admin layout can tell which route it is
+  // wrapping — it uses this to skip its Supabase count fetch on /admin/login.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+  const forward = () =>
+    NextResponse.next({ request: { headers: requestHeaders } });
+
   if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-    return NextResponse.next();
+    return forward();
   }
 
   const cookie = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
@@ -28,7 +35,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  return NextResponse.next();
+  return forward();
 }
 
 export const config = {
