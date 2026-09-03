@@ -49,8 +49,7 @@ export default function CtaBand() {
                 <Icon name="ArrowRight" className="h-5 w-5" />
               </Button>
 
-              {/* Opens WhatsApp with the booking message pre-filled.
-                  TODO: set the real number in data/content.ts (WHATSAPP_NUMBER). */}
+              {/* Opens WhatsApp with the booking message pre-filled. */}
               <a
                 href={whatsappLink(whatsappMessages.booking)}
                 target="_blank"

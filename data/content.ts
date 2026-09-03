@@ -59,11 +59,10 @@ export const site = {
  * ----------------------------------------------------------------------- */
 
 /**
- * TODO: Insert the real WhatsApp number — country code first, digits only,
- * no "+", spaces or dashes. Example for Somalia: "252612345678".
- * This single value drives every WhatsApp link on the site.
+ * The business WhatsApp number — country code first, digits only, no "+",
+ * spaces or dashes. This single value drives every WhatsApp link on the site.
  */
-export const WHATSAPP_NUMBER = "000000000000";
+export const WHATSAPP_NUMBER = "252618755455";
 
 /** The pre-filled message used by each WhatsApp entry point. */
 export const whatsappMessages = {
@@ -80,17 +79,15 @@ export function whatsappLink(message: string = whatsappMessages.general) {
 }
 
 export const contact = {
-  // TODO: Insert the real phone number (used for the "tel:" link).
-  phone: "[Insert Phone Number]",
-  phoneHref: "tel:+000000000000", // TODO: Insert real phone number in international format.
+  // Phone and WhatsApp are the same line. Somalia country code +252.
+  phone: "+252 61 8755455", // display text
+  phoneHref: "tel:+252618755455", // international format, digits only
 
-  // TODO: Insert the real WhatsApp number (display text only — links use WHATSAPP_NUMBER above).
-  whatsapp: "[Insert WhatsApp Number]",
+  whatsapp: "+252 61 8755455", // display text — links use WHATSAPP_NUMBER above
   whatsappHref: whatsappLink(),
 
-  // TODO: Insert the real email address.
-  email: "[Insert Email Address]",
-  emailHref: "mailto:info@example.com", // TODO: Insert real email address.
+  email: "mahad.omaari@gmail.com",
+  emailHref: "mailto:mahad.omaari@gmail.com",
 
   address: "Mogadishu, Somalia",
   addressLine2: "Mogadishu & Surrounding Areas",

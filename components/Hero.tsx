@@ -120,7 +120,6 @@ export default function Hero() {
               <Icon name="ArrowRight" className="h-5 w-5" />
             </Link>
 
-            {/* TODO: set the real WhatsApp number in data/content.ts (WHATSAPP_NUMBER). */}
             <a
               href={whatsappLink(whatsappMessages.hero)}
               target="_blank"

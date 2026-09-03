@@ -134,7 +134,6 @@ export default function ContactSection() {
                     <p className="font-heading font-semibold !text-white">
                       Phone
                     </p>
-                    {/* TODO: replace the placeholder phone number in data/content.ts */}
                     <a
                       href={contact.phoneHref}
                       className="mt-0.5 block text-white/75 transition-colors hover:text-sky"
@@ -155,7 +154,6 @@ export default function ContactSection() {
                     <p className="font-heading font-semibold !text-white">
                       WhatsApp
                     </p>
-                    {/* TODO: replace the placeholder WhatsApp number in data/content.ts */}
                     <a
                       href={contact.whatsappHref}
                       target="_blank"
@@ -178,7 +176,6 @@ export default function ContactSection() {
                     <p className="font-heading font-semibold !text-white">
                       Email
                     </p>
-                    {/* TODO: replace the placeholder email address in data/content.ts */}
                     <a
                       href={contact.emailHref}
                       className="mt-0.5 block break-all text-white/75 transition-colors hover:text-sky"

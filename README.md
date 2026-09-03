@@ -18,9 +18,9 @@ marked with a `// TODO:` or `[Insert ...]` in the code. Work top to bottom.
 
 | # | What | Where | Notes |
 | - | ---- | ----- | ----- |
-| 1 | **Phone number** | `data/content.ts` → `contact.phone` and `contact.phoneHref` | Two places: the display text and the `tel:` link. Use international format for the link (`tel:+252…`). |
-| 2 | **WhatsApp number** | `data/content.ts` → `WHATSAPP_NUMBER` | **One value drives every WhatsApp link on the site** (floating button, hero, CTA band, FAQ, contact panel). Digits only, country code first, no `+`, spaces or dashes — e.g. `252612345678`. Also update `contact.whatsapp` for the display text. |
-| 3 | **Email address** | `data/content.ts` → `contact.email` and `contact.emailHref` | Display text and the `mailto:` link. |
+| 1 | ✅ **Phone number** | `data/content.ts` → `contact.phone` and `contact.phoneHref` | Done — `+252 61 8755455` / `tel:+252618755455`. |
+| 2 | ✅ **WhatsApp number** | `data/content.ts` → `WHATSAPP_NUMBER` | Done — `252618755455` drives every WhatsApp link (floating button, hero, CTA band, FAQ, contact panel). `contact.whatsapp` holds the display text. |
+| 3 | ✅ **Email address** | `data/content.ts` → `contact.email` and `contact.emailHref` | Done — `mahad.omaari@gmail.com`. |
 | 4 | **Facebook link** | `data/content.ts` → `contact.socials[0].href` | Currently `#`. Full URL. |
 | 5 | **Instagram link** | `data/content.ts` → `contact.socials[1].href` | Currently `#`. Full URL. |
 | 6 | **og:url / domain** | `data/content.ts` → `site.url` | Currently `https://bilic-cleaning.example.com`. This feeds `metadataBase`, Open Graph and Twitter cards — every social preview is wrong until you change it. |
@@ -201,12 +201,9 @@ All of these are marked with `// TODO:` comments in the code. They are **all** i
 
 | Placeholder                | Where                                   | What to put                                              |
 | -------------------------- | --------------------------------------- | -------------------------------------------------------- |
-| `[Insert Phone Number]`    | `contact.phone`                         | The display phone number                                  |
-| `tel:+000000000000`        | `contact.phoneHref`                     | Same number in international format, e.g. `tel:+252...`   |
-| `[Insert WhatsApp Number]` | `contact.whatsapp`                      | The display WhatsApp number                               |
-| `"000000000000"`           | `WHATSAPP_NUMBER`                       | **The one that matters** — drives every WhatsApp link. Digits only, no `+`/spaces |
-| `[Insert Email Address]`   | `contact.email`                         | The display email address                                 |
-| `mailto:info@example.com`  | `contact.emailHref`                     | The same email address                                    |
+| ~~Phone number~~ ✅ set    | `contact.phone` / `contact.phoneHref`   | `+252 61 8755455` / `tel:+252618755455`                   |
+| ~~WhatsApp number~~ ✅ set | `WHATSAPP_NUMBER` / `contact.whatsapp`  | `252618755455` — drives every WhatsApp link               |
+| ~~Email address~~ ✅ set   | `contact.email` / `contact.emailHref`   | `mahad.omaari@gmail.com`                                  |
 | `[Insert Facebook Link]`   | `contact.socials[0].href`               | Full Facebook page URL                                    |
 | `[Insert Instagram Link]`  | `contact.socials[1].href`               | Full Instagram profile URL                                |
 | `site.url`                 | `site.url`                              | The real domain, once deployed (og:url / SEO / Open Graph) |
@@ -222,7 +219,7 @@ client does not have to think of an opening line. It is all driven by two things
 in `data/content.ts`:
 
 ```ts
-export const WHATSAPP_NUMBER = "000000000000";   // ← change this one value
+export const WHATSAPP_NUMBER = "252618755455";   // ← one value drives every WhatsApp link
 
 export const whatsappMessages = {
   general: "Hello Bilic Cleaning, I'd like a quote for a cleaning service.",

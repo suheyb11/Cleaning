@@ -8,7 +8,6 @@ import Icon from "./ui/Icon";
 /**
  * Floating WhatsApp button, fixed to the bottom-right corner on every page.
  * Opens the chat with a quote request already typed in.
- * TODO: put the real WhatsApp number in data/content.ts (WHATSAPP_NUMBER).
  */
 export default function WhatsAppButton() {
   const reduceMotion = useReducedMotion();

@@ -94,7 +94,6 @@ export default function Footer() {
             </li>
             <li className="flex gap-3">
               <Icon name="Phone" className="mt-0.5 h-4 w-4 shrink-0 text-sky" />
-              {/* TODO: replace the placeholder phone number in data/content.ts */}
               <a href={contact.phoneHref} className="hover:text-sky">
                 {contact.phone}
               </a>
@@ -104,7 +103,6 @@ export default function Footer() {
                 name="MessageCircle"
                 className="mt-0.5 h-4 w-4 shrink-0 text-sky"
               />
-              {/* TODO: replace the placeholder WhatsApp number in data/content.ts */}
               <a
                 href={contact.whatsappHref}
                 target="_blank"
@@ -116,7 +114,6 @@ export default function Footer() {
             </li>
             <li className="flex gap-3">
               <Icon name="Mail" className="mt-0.5 h-4 w-4 shrink-0 text-sky" />
-              {/* TODO: replace the placeholder email address in data/content.ts */}
               <a href={contact.emailHref} className="break-all hover:text-sky">
                 {contact.email}
               </a>

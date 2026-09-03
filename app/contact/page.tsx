@@ -74,7 +74,6 @@ export default function ContactPage() {
                     <dt className="font-heading font-semibold text-navy">
                       Phone
                     </dt>
-                    {/* TODO: replace the placeholder phone number in data/content.ts */}
                     <dd className="mt-0.5">
                       <a
                         href={contact.phoneHref}
@@ -89,7 +88,6 @@ export default function ContactPage() {
                     <dt className="font-heading font-semibold text-navy">
                       WhatsApp
                     </dt>
-                    {/* TODO: replace the placeholder WhatsApp number in data/content.ts */}
                     <dd className="mt-0.5">
                       <a
                         href={contact.whatsappHref}
@@ -98,6 +96,20 @@ export default function ContactPage() {
                         className="text-muted transition-colors hover:text-sky"
                       >
                         {contact.whatsapp}
+                      </a>
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="font-heading font-semibold text-navy">
+                      Email
+                    </dt>
+                    <dd className="mt-0.5">
+                      <a
+                        href={contact.emailHref}
+                        className="break-all text-muted transition-colors hover:text-sky"
+                      >
+                        {contact.email}
                       </a>
                     </dd>
                   </div>
